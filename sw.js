@@ -1,4 +1,4 @@
-const CACHE="piping-qc-v2";
+const CACHE="piping-qc-v3";
 const FILES=["./","index.html","manifest.webmanifest","icon-180.png","icon-192.png","icon-512.png",
 "fonts/BarlowCondensed-600.woff2","fonts/BarlowCondensed-700.woff2","fonts/IBMPlexMono-500.woff2","fonts/IBMPlexMono-600.woff2","fonts/IBMPlexSans.woff2"];
 self.addEventListener("install",e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES)));self.skipWaiting()});

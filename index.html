@@ -306,6 +306,29 @@ td.mono{font-family:var(--mono)}
 #gauge text{font-family:var(--mono)}
 svg .t-ink{fill:var(--ink)} svg .t-mut{fill:var(--muted)} svg .t-mono{font-family:var(--mono)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* calculator */
+.cfac{background:var(--card);border:2px solid var(--line);border-radius:18px;overflow:hidden;display:grid;transition:border-color .3s}
+.cfac > header{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line)}
+.cfac > header .ic{width:38px;height:38px;border-radius:10px;background:var(--sc);color:#fff;display:grid;place-items:center;font:800 19px var(--display)}
+.cfac > header .muted{font-size:12px;font-family:var(--mono)}
+.cfac.limit{border-color:var(--sc);box-shadow:0 0 0 3px color-mix(in srgb,var(--sc) 25%,transparent)}
+.cfac.limit > header h3::after{content:"LIMITING";margin-left:8px;font:700 11px var(--mono);background:var(--sc);color:#fff;border-radius:6px;padding:2px 6px;vertical-align:middle}
+.cgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;padding:14px}
+.work{margin:0 14px 14px;padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--sc) 10%,transparent);font:500 13px/1.6 var(--mono);display:grid;gap:2px;overflow-wrap:anywhere}
+.work .ans{font:700 20px var(--mono);color:var(--sc)}
+.cres{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;display:grid;gap:14px;box-shadow:var(--shadow)}
+.bars{display:grid;gap:8px}
+.barrow{display:grid;grid-template-columns:minmax(0,9em) minmax(0,1fr) auto;gap:10px;align-items:center;font-size:13px}
+.barrow div{height:14px;background:var(--line);border-radius:7px;overflow:hidden}
+.barrow i{display:block;height:100%;border-radius:7px;transition:width .5s}
+.barrow b{font:700 14px var(--mono);min-width:4.5em;text-align:right}
+.barrow.low span{font-weight:700}
+.tpbox{border-radius:14px;padding:14px;background:var(--good-soft);display:grid;gap:4px}
+.tpbox.bad{background:var(--bad-soft)}
+.tpbox .tp{font:800 34px var(--display)}
+.tpmini{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px}
+.tpmini div{border:1px solid var(--line);border-radius:12px;padding:10px;display:grid}
+.tpmini span{font-size:12px;color:var(--muted)} .tpmini b{font:700 16px var(--mono)}
 
 </style>
 </head>
@@ -344,32 +367,57 @@ svg .t-ink{fill:var(--ink)} svg .t-mut{fill:var(--muted)} svg .t-mono{font-famil
     <p class="muted" style="font-size:12px">Saudi Aramco SAES, SAEP, SAIC, SATIP, SATR, GI and Schedule Q documents are proprietary and revised often. Values come from your study deck and public codes. Check each against the current revision your project or agency holds. Welding QC is out of scope.</p>
   </section>
   <section class="view" id="v-calc" hidden>
-    <h2>Hydrotest pressure, step by step</h2>
-    <p class="muted" style="max-width:70ch">Pick a line and see how the test pressure, relief valve and gauge are chosen. The rule is SAES-L-150 §7.1: 90% SMYS hoop stress in the pipe, unless a flange or valve limits it, and never below the B31.3 minimum.</p>
-    <div class="calc">
-      <div class="panel">
-        <label class="f">Pipe size (NPS)<select id="c-nps"></select></label>
-        <label class="f">Schedule<select id="c-sch"><option>40</option><option>80</option><option>160</option></select></label>
-        <label class="f">Pipe material<select id="c-mat">
-          <option value="35000">ASTM A106 Gr B (SMYS 35,000 psi)</option>
-          <option value="35000">ASTM A333 Gr 6 (SMYS 35,000 psi)</option>
-          <option value="25000">ASTM A312 TP316L (SMYS 25,000 psi)</option>
-        </select></label>
-        <label class="f">Flange / valve class (Group 1.1, rating at 38 °C)<select id="c-cls">
-          <option value="285">Class 150 (285 psig)</option>
-          <option value="740" selected>Class 300 (740 psig)</option>
-          <option value="1480">Class 600 (1480 psig)</option>
-          <option value="2220">Class 900 (2220 psig)</option>
-        </select></label>
-        <label class="f">Design pressure, psig<input type="number" id="c-dp" value="600" min="1" step="10"></label>
-        <p class="muted" style="font-size:13px">B31.3 minimum uses St/S = 1 (test at ambient, design below the creep range). Stainless flanges are Group 2.x with lower ratings, so check the B16.5 table for them.</p>
-      </div>
-      <div class="panel">
-        <div class="ladder" id="ladder"></div>
-        <svg id="gauge" viewBox="0 0 320 190" role="img" aria-label="Test gauge with the 30 to 80 percent band" style="max-width:360px;width:100%"></svg>
-        <p class="muted" id="gaugetxt" style="font-size:13px"></p>
-      </div>
+    <div class="stack" style="gap:6px">
+      <h2>Hydrotest pressure calculator</h2>
+      <p class="muted">The test pressure is set by the system's limiting factors. Each one is worked out below, then the lowest limit is compared with the code minimum.</p>
     </div>
+    <div class="row"><span class="muted" style="font-size:13px">Load an example from the sheet:</span><button class="btn" data-ex="1">2" Sch 40 A106 B</button><button class="btn" data-ex="2">4" Sch 80 A106 B</button></div>
+
+    <div class="cfac" style="--sc:var(--k3)">
+      <header><span class="ic">3</span><div><h3>Pipe wall thickness</h3><span class="muted">SAES-L-150 §7.1 · 90% SMYS</span></div><label class="toggle"><input type="checkbox" id="c-usepipe" checked> Include</label></header>
+      <div class="cgrid">
+        <label class="f">Pipe size (NPS)<select id="c-nps"></select></label>
+        <label class="f">Schedule<select id="c-sch"></select></label>
+        <label class="f">Outside diameter, OD (mm)<input type="number" id="c-od" step="0.1" inputmode="decimal"></label>
+        <label class="f">Nominal wall, t (mm)<input type="number" id="c-wall" step="0.01" inputmode="decimal"></label>
+        <label class="f">Pipe type (mill tolerance)<select id="c-type"><option value="seamless">Seamless: minus 12.5%</option><option value="seam">Seam welded: minus 0.01 in (0.254 mm)</option></select></label>
+        <label class="f">Material (SMYS from B31.3 App. A)<select id="c-mat"></select></label>
+        <label class="f">SMYS, psi<input type="number" id="c-smys" step="500" inputmode="numeric"></label>
+      </div>
+      <div class="work" id="w-pipe"></div>
+    </div>
+
+    <div class="cfac" style="--sc:var(--k4)">
+      <header><span class="ic">1</span><div><h3>Flange</h3><span class="muted">ASME B16.5 §8.2.2 · 1.5 × rating, next 25 psi</span></div><label class="toggle"><input type="checkbox" id="c-usefl" checked> Include</label></header>
+      <div class="cgrid">
+        <label class="f">Flange material group<select id="c-flg" class="grp"></select></label>
+        <label class="f">Pressure class<select id="c-flc" class="cls"></select></label>
+        <label class="f">Rating at test temperature, psig<input type="number" id="c-flr" inputmode="numeric"></label>
+      </div>
+      <div class="work" id="w-fl"></div>
+    </div>
+
+    <div class="cfac" style="--sc:var(--k1)">
+      <header><span class="ic">2</span><div><h3>Valve</h3><span class="muted">ASME B16.34 §7.1.1 · 1.5 × rating, next 25 psi</span></div><label class="toggle"><input type="checkbox" id="c-usevl" checked> Include</label></header>
+      <div class="cgrid">
+        <label class="f">Valve body material group<select id="c-vlg" class="grp"></select></label>
+        <label class="f">Pressure class<select id="c-vlc" class="cls"></select></label>
+        <label class="f">Rating at test temperature, psig<input type="number" id="c-vlr" inputmode="numeric"></label>
+      </div>
+      <div class="work" id="w-vl"></div>
+    </div>
+
+    <div class="cfac" style="--sc:var(--k6)">
+      <header><span class="ic">M</span><div><h3>Code minimum</h3><span class="muted">ASME B31.3 §345.4.2 · SAES-L-150 §7.1</span></div></header>
+      <div class="cgrid">
+        <label class="f">Design pressure, psig<input type="number" id="c-dp" step="10" inputmode="numeric"></label>
+        <label class="f">St / S (stress ratio, normally 1)<input type="number" id="c-ratio" step="0.01" value="1" inputmode="decimal"></label>
+      </div>
+      <div class="work" id="w-min"></div>
+    </div>
+
+    <div class="cres" id="c-result"></div>
+    <p class="muted" style="font-size:12px">Ratings shown are ASME B16.5 / B16.34 standard class values at −29 to 38 °C. If the test temperature is higher, or your material group differs, type the rating from the table into the box. SMYS comes from B31.3 Appendix A. Confirm values against the current editions your project uses.</p>
   </section>
   <section class="view" id="v-numbers" hidden>
     <h2>Numbers to know cold</h2>
@@ -1112,10 +1160,10 @@ ${pill(20,40,"Engineering documents",'var(--k0)','data-s="1"',12)}${pill(20,80,"
 ["Engineering documents: line list, test diagram, marked-up P&ID, isometrics, support drawings.","Construction records: the weld summary from welding QC, flange tightening and valve test reports.","Test equipment records: relief valve certificate, gauge calibration, manifold certificate, water analysis.","The approved procedure and pack are on site during the test. Records are kept at least 5 years."]],
 
 t1:()=>[`<line x1="60" y1="250" x2="600" y2="250" stroke="var(--ink)" stroke-width="2"/>
-${[["Pipe @ 90% SMYS",1840,"var(--k0)",1],["Flange Cl 300 × 1.5",1125,"var(--k4)",2],["Code min 1.5 × DP",900,"var(--muted)",4]].map(([t,v,c,s],i)=>`<g data-s="${s}"><rect x="${100+i*170}" y="${250-v/10}" width="110" height="${v/10}" rx="6" fill="${c}" data-init="scaleY(0)" data-m="${s}:scaleY(1)" style="transform-origin:bottom;transform-box:fill-box"/><text x="${155+i*170}" y="${242-v/10}" font-size="15" font-weight="800" fill="var(--ink)" text-anchor="middle">${v} psig</text><text x="${155+i*170}" y="272" font-size="12" font-weight="700" fill="var(--ink)" text-anchor="middle">${t}</text></g>`).join("")}
-<g data-s="3"><rect x="266" y="133" width="118" height="117" rx="8" fill="none" stroke="var(--k8)" stroke-width="4" class="pulse"/>${pill(400,110,"TP = lowest = 1125 psig",'var(--k8)')}</g>
-<g data-s="4"><line x1="60" y1="160" x2="600" y2="160" stroke="var(--bad)" stroke-width="2" stroke-dasharray="6 5"/>${tick(560,140)}</g>`,
-["Pipe limit: the pressure that gives a hoop stress of 90% SMYS (6 in Sch 40 A106 B ≈ 1840 psig).","Flange and valve limit: 1.5 × the 38 °C rating. Class 300 gives 1125 psig.","The test pressure is the lowest component limit.","Check it is not below the code minimum of 1.5 × design pressure. (Example: DP 600 psig.)"]],
+${[["Pipe @ 90% SMYS",2328,"var(--k0)",1],["Flange Cl 300 × 1.5",1125,"var(--k4)",2],["Code min 1.5 × DP",900,"var(--muted)",4]].map(([t,v,c,s],i)=>`<g data-s="${s}"><rect x="${100+i*170}" y="${250-v/12}" width="110" height="${v/12}" rx="6" fill="${c}" data-init="scaleY(0)" data-m="${s}:scaleY(1)" style="transform-origin:bottom;transform-box:fill-box"/><text x="${155+i*170}" y="${242-v/12}" font-size="15" font-weight="800" fill="var(--ink)" text-anchor="middle">${v} psig</text><text x="${155+i*170}" y="272" font-size="12" font-weight="700" fill="var(--ink)" text-anchor="middle">${t}</text></g>`).join("")}
+<g data-s="3"><rect x="266" y="152" width="118" height="98" rx="8" fill="none" stroke="var(--k8)" stroke-width="4" class="pulse"/>${pill(400,110,"TP = lowest = 1125 psig",'var(--k8)')}</g>
+<g data-s="4"><line x1="60" y1="175" x2="600" y2="175" stroke="var(--bad)" stroke-width="2" stroke-dasharray="6 5"/>${tick(560,158)}</g>`,
+["Pipe limit: the pressure that gives a hoop stress of 90% SMYS (6 in Sch 40 A106 B ≈ 2,328 psig).","Flange and valve limit: 1.5 × the 38 °C rating. Class 300 gives 1125 psig.","The test pressure is the lowest component limit.","Check it is not below the code minimum of 1.5 × design pressure. (Example: DP 600 psig.)"]],
 
 t2:()=>[`${pipe(20,200,600,28)}${vpipe(140,120,66,14)}${vpipe(470,90,96,14)}
 <g data-s="1">${gauge(140,92,34,'data-init="rotate(-90deg)" data-m="1:rotate(10deg)"')}${gauge(470,62,34,'data-init="rotate(-90deg)" data-m="1:rotate(14deg)"')}${T(140,150,"manifold","",11,700,"var(--ink)","middle")}${T(470,124,"highest point","",11,700,"var(--ink)","middle")}</g>
@@ -1493,45 +1541,81 @@ $("#bk-restore").addEventListener("click",()=>{try{const o=JSON.parse(decodeURIC
 let resetArmed=0;
 $("#reset").addEventListener("click",()=>{const b=$("#reset");if(Date.now()-resetArmed>4000){resetArmed=Date.now();b.textContent="Tap again to delete all progress";setTimeout(()=>{if(Date.now()-resetArmed>=4000)b.textContent="Reset all progress"},4100);return}try{Object.keys(allData()).forEach(k=>localStorage.removeItem(k))}catch(e){}location.reload()});
 
-/* ---------- calculator ---------- */
-const PIPE={ "2":[2.375,{40:.154,80:.218,160:.344}], "3":[3.5,{40:.216,80:.300,160:.438}], "4":[4.5,{40:.237,80:.337,160:.531}], "6":[6.625,{40:.280,80:.432,160:.719}], "8":[8.625,{40:.322,80:.500,160:.906}], "10":[10.75,{40:.365,80:.594,160:1.125}], "12":[12.75,{40:.406,80:.688,160:1.312}] };
+/* ---------- hydrotest pressure calculator ---------- */
+// OD in inches; wall thickness in inches by schedule (ASME B36.10M / B36.19M)
+const PIPES={
+"½":[0.840,{"10":.083,"40 / STD":.109,"80 / XS":.147,"160":.188,"XXS":.294}],
+"¾":[1.050,{"10":.083,"40 / STD":.113,"80 / XS":.154,"160":.219,"XXS":.308}],
+"1":[1.315,{"10":.109,"40 / STD":.133,"80 / XS":.179,"160":.250,"XXS":.358}],
+"1½":[1.900,{"10":.109,"40 / STD":.145,"80 / XS":.200,"160":.281,"XXS":.400}],
+"2":[2.375,{"10":.109,"40 / STD":.154,"80 / XS":.218,"160":.344,"XXS":.436}],
+"3":[3.500,{"10":.120,"40 / STD":.216,"80 / XS":.300,"160":.438,"XXS":.600}],
+"4":[4.500,{"10":.120,"40 / STD":.237,"80 / XS":.337,"120":.438,"160":.531,"XXS":.674}],
+"6":[6.625,{"10":.134,"40 / STD":.280,"80 / XS":.432,"120":.562,"160":.719,"XXS":.864}],
+"8":[8.625,{"10":.148,"20":.250,"30":.277,"40 / STD":.322,"60":.406,"80 / XS":.500,"100":.594,"120":.719,"140":.812,"160":.906}],
+"10":[10.75,{"10":.165,"20":.250,"30":.307,"40 / STD":.365,"60 / XS":.500,"80":.594,"100":.719,"120":.844,"140":1.000,"160":1.125}],
+"12":[12.75,{"10":.180,"20":.250,"30":.330,"STD":.375,"40":.406,"XS":.500,"60":.562,"80":.688,"100":.844,"120":1.000,"140":1.125,"160":1.312}],
+"14":[14.00,{"10":.250,"20":.312,"30 / STD":.375,"40":.438,"XS":.500,"60":.594,"80":.750,"100":.938,"120":1.094,"140":1.250,"160":1.406}],
+"16":[16.00,{"10":.250,"20":.312,"30 / STD":.375,"40 / XS":.500,"60":.656,"80":.844,"100":1.031,"120":1.219,"140":1.438,"160":1.594}],
+"18":[18.00,{"10":.250,"20":.312,"STD":.375,"30":.438,"XS":.500,"40":.562,"60":.750,"80":.938,"100":1.156,"120":1.375,"140":1.562,"160":1.781}],
+"20":[20.00,{"10":.250,"20 / STD":.375,"30 / XS":.500,"40":.594,"60":.812,"80":1.031,"100":1.281,"120":1.500,"140":1.750,"160":1.969}],
+"24":[24.00,{"10":.250,"20 / STD":.375,"XS":.500,"30":.562,"40":.688,"60":.969,"80":1.219,"100":1.531,"120":1.812,"140":2.062,"160":2.344}]
+};
+const MATS=[["ASTM A106 Gr B",35000],["ASTM A106 Gr C",40000],["ASTM A53 Gr B",35000],["API 5L Gr B",35000],["API 5L X42",42000],["API 5L X52",52000],["API 5L X60",60000],["ASTM A333 Gr 6",35000],["ASTM A335 P11 / P22",30000],["ASTM A312 TP304 / TP316",30000],["ASTM A312 TP304L / TP316L",25000],["Other (type SMYS)",0]];
+// standard class ratings, psig at −29 to 38 °C (ASME B16.5 Table 2 / B16.34)
+const CLASSES=[150,300,600,900,1500,2500];
+const GROUPS={"1.1 · A105 / A105N, A216 WCB, A350 LF2":[285,740,1480,2220,3705,6170],"1.2 · A216 WCC, A352 LCC":[290,750,1500,2250,3750,6250],"1.3 · A352 LCB":[265,695,1390,2085,3470,5785],"2.1 · F304, CF8":[275,720,1440,2160,3600,6000],"2.2 · F316, CF8M":[275,720,1440,2160,3600,6000],"2.3 · F304L, F316L":[230,600,1200,1800,3000,5000]};
+const MM=25.4, fmt=(n,d=0)=>Number(n).toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d});
 const RANGES=[100,160,300,600,1000,1500,2000,3000,5000,10000,15000];
-$("#c-nps").innerHTML=Object.keys(PIPE).map(k=>`<option value="${k}" ${k==="6"?"selected":""}>${k} in (OD ${PIPE[k][0]} in)</option>`).join("");
+const cv=id=>$("#"+id);
+function fillSch(keepWall){const nps=cv("c-nps").value,[od,w]=PIPES[nps];const prev=cv("c-sch").value;cv("c-sch").innerHTML=Object.keys(w).map(s=>`<option ${s===prev?"selected":""}>${s}</option>`).join("")+`<option value="custom">Other (type wall)</option>`;if(!w[prev]&&prev!=="custom")cv("c-sch").value=Object.keys(w).find(s=>s.startsWith("40"))||Object.keys(w)[0];cv("c-od").value=(od*MM).toFixed(1);if(!keepWall)setWall()}
+function setWall(){const s=cv("c-sch").value;if(s==="custom")return;cv("c-wall").value=(PIPES[cv("c-nps").value][1][s]*MM).toFixed(2)}
+function setRating(g,c,r){cv(r).value=GROUPS[cv(g).value][CLASSES.indexOf(+cv(c).value)]}
+function initCalc(){
+  cv("c-nps").innerHTML=Object.keys(PIPES).map(k=>`<option value="${k}">${k}" NPS</option>`).join(""); cv("c-nps").value="6";
+  cv("c-mat").innerHTML=MATS.map((m,i)=>`<option value="${i}">${m[0]}${m[1]?` (${fmt(m[1])} psi)`:""}</option>`).join("");
+  document.querySelectorAll("#v-calc .grp").forEach(s=>s.innerHTML=Object.keys(GROUPS).map(g=>`<option>${g}</option>`).join(""));
+  document.querySelectorAll("#v-calc .cls").forEach(s=>s.innerHTML=CLASSES.map(c=>`<option value="${c}">Class ${c}</option>`).join(""));
+  cv("c-flc").value="300"; cv("c-vlc").value="300"; setRating("c-flg","c-flc","c-flr"); setRating("c-vlg","c-vlc","c-vlr");
+  cv("c-smys").value=35000; cv("c-dp").value=600; fillSch();
+  cv("c-nps").onchange=()=>{fillSch();calc()};
+  cv("c-sch").onchange=()=>{setWall();calc()};
+  cv("c-wall").oninput=()=>{cv("c-sch").value="custom";calc()};
+  cv("c-od").oninput=calc;
+  cv("c-mat").onchange=()=>{const m=MATS[+cv("c-mat").value];if(m[1])cv("c-smys").value=m[1];calc()};
+  cv("c-smys").oninput=()=>{cv("c-mat").value=String(MATS.length-1);calc()};
+  [["c-flg","c-flc","c-flr"],["c-vlg","c-vlc","c-vlr"]].forEach(([g,c,r])=>{cv(g).onchange=cv(c).onchange=()=>{setRating(g,c,r);calc()};cv(r).oninput=calc});
+  ["c-type","c-dp","c-ratio","c-usepipe","c-usefl","c-usevl"].forEach(id=>cv(id).addEventListener("input",calc));
+  document.querySelectorAll("#v-calc [data-ex]").forEach(b=>b.onclick=()=>{const two=b.dataset.ex==="2";cv("c-nps").value=two?"4":"2";fillSch(true);cv("c-sch").value=two?"80 / XS":"40 / STD";setWall();cv("c-type").value="seamless";cv("c-mat").value="0";cv("c-smys").value=35000;calc();cv("w-pipe").scrollIntoView({behavior:"smooth",block:"center"})});
+}
 function calc(){
-  const nps=$("#c-nps").value, sch=$("#c-sch").value, smys=+$("#c-mat").value, rating=+$("#c-cls").value, dp=Math.max(1,+$("#c-dp").value||0);
-  const [od,walls]=PIPE[nps], t=walls[sch]*0.875;
-  const pipe=Math.floor(2*t*0.9*smys/od);
-  const flange=Math.ceil(1.5*rating/25)*25;
-  const codemin=Math.ceil(1.5*dp);
-  const tp=Math.min(pipe,flange);
-  const low=tp<codemin;
-  const rv=Math.round(tp*1.05);
-  const g=RANGES.find(r=>tp/r<=0.8&&tp/r>=0.3);
-  const limitBy = pipe<flange?"pipe":"flange / valve";
-  $("#ladder").innerHTML = [
-    ["Pipe limit at 90% SMYS",`2 × ${t.toFixed(3)} in × 0.9 × ${smys.toLocaleString()} ÷ ${od}`,pipe,pipe<=flange],
-    ["Flange / valve limit",`1.5 × ${rating} psig, rounded up to 25`,flange,flange<pipe],
-    ["B31.3 minimum (never below)",`1.5 × ${dp} psig design`,codemin,false]
-  ].map(([a,b,v,w])=>`<div class="rung ${w?'win':''}"><div><div style="font-weight:600">${a}</div><div class="muted" style="font-size:12px;font-family:var(--mono)">${b}</div></div><b>${v.toLocaleString()} psig</b></div>`).join("")
-  + `<div class="rung ${low?'warn':'win'}"><div><div style="font-weight:600">Test pressure</div><div class="muted" style="font-size:12px">${low?`Below the code minimum. The ${limitBy} cannot take the code test: raise to engineering, do not test.`:`Limited by the ${limitBy}`}</div></div><b>${tp.toLocaleString()} psig</b></div>`
-  + `<div class="rung"><div><div style="font-weight:600">Test relief valve</div><div class="muted" style="font-size:12px">TP + 5% (TP + 10% only if TP is below 85% SMYS)</div></div><b>${rv.toLocaleString()} psig</b></div>`;
-  drawGauge(tp,g);
-  $("#gaugetxt").textContent = g?`Smallest standard gauge with TP inside 30–80%: 0–${g.toLocaleString()} psig (TP = ${Math.round(tp/g*100)}% of scale). Use at least two, calibrated within 30 days.`:"No standard range fits. Check the gauge range by hand.";
+  const odmm=+cv("c-od").value||0, tmm=+cv("c-wall").value||0, seam=cv("c-type").value==="seam", smys=+cv("c-smys").value||0;
+  const T=seam?tmm-0.254:tmm*0.875;
+  const pipe=odmm>0&&T>0?Math.floor(2*T*0.9*smys/odmm):0;
+  cv("w-pipe").innerHTML=`<div>T = ${fmt(tmm,2)} mm ${seam?"− 0.254 mm (0.01 in)":"× 0.875 (minus 12.5%)"} = <b>${fmt(T,3)} mm</b></div>
+   <div>P = 2T × 0.9 × SMYS ÷ OD = 2 × ${fmt(T,3)} × 0.9 × ${fmt(smys)} ÷ ${fmt(odmm,1)}</div>
+   <div class="ans">= ${fmt(pipe)} psig</div>`;
+  const fac=r=>{const raw=1.5*r,up=Math.ceil(raw/25-1e-9)*25;return [raw,up]};
+  const flr=+cv("c-flr").value||0, vlr=+cv("c-vlr").value||0, [flraw,fl]=fac(flr), [vlraw,vl]=fac(vlr);
+  cv("w-fl").innerHTML=`<div>1.5 × ${fmt(flr)} = ${fmt(flraw,1)} psig, rounded up to the next 25 psi (+${fmt(fl-flraw,1)})</div><div class="ans">= ${fmt(fl)} psig</div>`;
+  cv("w-vl").innerHTML=`<div>1.5 × ${fmt(vlr)} = ${fmt(vlraw,1)} psig, rounded up to the next 25 psi (+${fmt(vl-vlraw,1)})</div><div class="ans">= ${fmt(vl)} psig</div>`;
+  const dp=+cv("c-dp").value||0, ratio=+cv("c-ratio").value||1, min=Math.ceil(1.5*dp*ratio);
+  cv("w-min").innerHTML=`<div>1.5 × ${fmt(dp)} psig × ${ratio}. The test pressure can't be lower than this.</div><div class="ans">≥ ${fmt(min)} psig</div>`;
+  const lim=[["Pipe wall (90% SMYS)",pipe,cv("c-usepipe").checked,"var(--k3)","c-usepipe"],["Flange",fl,cv("c-usefl").checked,"var(--k4)","c-usefl"],["Valve",vl,cv("c-usevl").checked,"var(--k1)","c-usevl"]].filter(l=>l[2]&&l[1]>0);
+  document.querySelectorAll("#v-calc .cfac").forEach(c=>c.classList.remove("limit"));
+  if(!lim.length){cv("c-result").innerHTML=`<p>Include at least one limiting factor.</p>`;return}
+  const low=Math.min(...lim.map(l=>l[1])), who=lim.filter(l=>l[1]===low);
+  who.forEach(w=>cv(w[4]).closest(".cfac").classList.add("limit"));
+  const names=who.map(w=>w[0]).join(" and "), ok=low>=min, tp=low, rv=Math.round(tp*1.05), g=RANGES.find(r=>tp/r<=0.8&&tp/r>=0.3);
+  const max=Math.max(low,min,...lim.map(l=>l[1]))*1.04;
+  cv("c-result").innerHTML=`<h3>Result</h3>
+  <div class="bars">${lim.map(l=>`<div class="barrow ${l[1]===low?"low":""}"><span>${l[0]}${l[1]===low?" · limits":""}</span><div><i style="width:${l[1]/max*100}%;background:${l[3]}"></i></div><b>${fmt(l[1])}</b></div>`).join("")}
+  <div class="barrow"><span>Code minimum</span><div><i style="width:${min/max*100}%;background:var(--k6)"></i></div><b>${fmt(min)}</b></div></div>
+  ${ok?`<div class="tpbox"><span class="eyebrow">Test pressure</span><div class="tp">${fmt(tp)} psig</div><p>Limiting factor: <b>${names}</b>. Allowed range ${fmt(min)} to ${fmt(low)} psig. SAES-L-150 tests at 90% SMYS unless a component limits it, so use ${fmt(tp)} psig.</p></div>
+  <div class="tpmini"><div><span>Test relief valve (TP + 5%)</span><b>${fmt(rv)} psig</b></div><div><span>Gauge range (TP at 30–80%)</span><b>${g?`0–${fmt(g)} psig (${Math.round(tp/g*100)}%)`:"check by hand"}</b></div></div>`
+  :`<div class="tpbox bad"><span class="eyebrow">Can't test</span><div class="tp">${fmt(low)} &lt; ${fmt(min)}</div><p>The ${names.toLowerCase()} limit is below 1.5 × design pressure. Don't test. Raise it to engineering.</p></div>`}`;
 }
-function drawGauge(tp,g){
-  const cx=160,cy=160,r=120, frac=g?Math.min(tp/g,1):0;
-  const pt=(f,rr)=>{const a=Math.PI*(1-f);return [cx+rr*Math.cos(a),cy-rr*Math.sin(a)]};
-  const arc=(f0,f1,rr)=>{const [x0,y0]=pt(f0,rr),[x1,y1]=pt(f1,rr);return `M${x0.toFixed(1)} ${y0.toFixed(1)} A${rr} ${rr} 0 0 1 ${x1.toFixed(1)} ${y1.toFixed(1)}`};
-  const [nx,ny]=pt(frac,r-26);
-  $("#gauge").innerHTML = `<path d="${arc(0,1,r)}" fill="none" stroke="var(--line)" stroke-width="16"/>
-  <path d="${arc(.3,.8,r)}" fill="none" stroke="var(--good)" stroke-width="16"/>
-  ${[0,.3,.8,1].map(f=>{const [x,y]=pt(f,r+20);return `<text x="${x.toFixed(1)}" y="${(y+4).toFixed(1)}" font-size="11" text-anchor="middle" class="t-mut t-mono">${Math.round(f*100)}%</text>`}).join("")}
-  <line x1="${cx}" y1="${cy}" x2="${nx.toFixed(1)}" y2="${ny.toFixed(1)}" stroke="var(--ink)" stroke-width="3" stroke-linecap="round" style="transition:all .6s"/>
-  <circle cx="${cx}" cy="${cy}" r="7" fill="var(--ink)"/>
-  <text x="${cx}" y="${cy+26}" font-size="13" text-anchor="middle" class="t-ink t-mono">${g?`0–${g.toLocaleString()} psig`:''}</text>`;
-}
-["c-nps","c-sch","c-mat","c-cls","c-dp"].forEach(id=>$("#"+id).addEventListener("input",calc));
-
+initCalc();
 
 function renderPlan(){
   const startStr=store.get("pqc-start",""); $("#startdate").value=startStr;
