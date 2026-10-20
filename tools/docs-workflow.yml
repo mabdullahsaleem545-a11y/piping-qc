@@ -13,8 +13,11 @@ on:
   release:
     types: [published]
   push:
-    paths: ["docs/**"]
+    paths: ["docs/**", ".github/workflows/build-library.yml"]
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   build:
@@ -48,7 +51,10 @@ jobs:
           INDEX_PASSPHRASE: ${{ secrets.INDEX_PASSPHRASE }}
         run: |
           pip install pypdf cryptography
-          python app/tools/build_index.py --out app/kb input
+          python app/tools/build_index.py --out app/kb input 2> build.log || { tail -5 build.log; echo "::error::Build failed: $(tail -1 build.log)"; exit 1; }
+          cat build.log
+          echo "::notice::Library built: $(cat app/kb/manifest.json | tr -d '\n ')"
+          grep "skipped" build.log | head -20 | while read -r l; do echo "::warning::$l"; done
 
       - name: Publish to the app
         run: |
@@ -57,4 +63,4 @@ jobs:
           git config user.email "library-bot@users.noreply.github.com"
           git add kb/manifest.json kb/index.bin
           git commit -m "Update standards library" || exit 0
-          git push
+          git push 2> push.log || { cat push.log; echo "::error::Push to piping-qc failed: $(grep -iE 'denied|403|error|fatal' push.log | head -2 | tr '\n' ' ')"; exit 1; }
