@@ -1,0 +1,16 @@
+{
+  "name": "Piping QC Field Book",
+  "short_name": "Piping QC",
+  "description": "Offline study app for Saudi Aramco piping QC inspectors.",
+  "start_url": "./index.html#today",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#13263A",
+  "theme_color": "#13263A",
+  "icons": [
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}
