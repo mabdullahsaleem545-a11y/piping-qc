@@ -358,6 +358,8 @@ mark{background:color-mix(in srgb,var(--k8) 35%,transparent);color:inherit;borde
 .askform input{font:500 16px var(--body);color:var(--ink);background:var(--card);border:2px solid var(--line);border-radius:14px;padding:12px 14px;width:100%}
 .askform input:focus{border-color:var(--k0);outline:none}
 
+.kbprog{height:6px;border-radius:3px;background:var(--line,#ddd);overflow:hidden;margin-top:8px}.kbprog i{display:block;height:100%;background:var(--k1);transition:width .2s}
+
 </style>
 </head>
 <body>
@@ -1696,17 +1698,20 @@ function fieldBookCorpus(){
   S.forEach(s=>s.chunks.forEach((c,ci)=>{chunks.push({d:0,c:`${s.name}`,h:c.h,t:c.p.map(p=>`${p[0]}: ${p[1]} (${p[2]}).${p[3]?" "+p[3]:""}`).join(" "),fb:s.id+ci})}));
   return {docs,chunks};
 }
-function buildIndex(corpus){
-  const post=new Map(), len=[], docOf=[];
-  corpus.chunks.forEach((ch,i)=>{
-    const tf=new Map(), add=(w,k)=>tf.set(w,(tf.get(w)||0)+k);
-    const tt=toks(ch.t); tt.forEach(w=>add(w,1)); toks(ch.h).forEach(w=>add(w,2));
-    add(docKey(corpus.docs[ch.d].id),1);
-    len.push(tt.length+4); docOf.push(ch.d);
-    tf.forEach((n,w)=>{let a=post.get(w);if(!a)post.set(w,a=[]);a.push(i,n)});
-  });
-  const avg=len.reduce((a,b)=>a+b,0)/Math.max(1,len.length);
-  return {post,len,avg,N:len.length,corpus};
+function indexChunk(ix,ch,i){
+  const tf=new Map(), add=(w,k)=>tf.set(w,(tf.get(w)||0)+k);
+  const tt=toks(ch.t); tt.forEach(w=>add(w,1)); toks(ch.h).forEach(w=>add(w,2));
+  add(docKey(ix.corpus.docs[ch.d].id),1);
+  ix.len.push(tt.length+4);
+  tf.forEach((n,w)=>{let a=ix.post.get(w);if(!a)ix.post.set(w,a=[]);a.push(i,n)});
+}
+function finishIndex(ix){ix.N=ix.len.length;ix.avg=ix.len.reduce((a,b)=>a+b,0)/Math.max(1,ix.N);return ix}
+function buildIndex(corpus){const ix={post:new Map(),len:[],corpus};corpus.chunks.forEach((ch,i)=>indexChunk(ix,ch,i));return finishIndex(ix)}
+/* large libraries: build in slices so the page stays responsive and can show progress */
+async function buildIndexAsync(corpus,onProgress){
+  const ix={post:new Map(),len:[],corpus}, n=corpus.chunks.length;
+  for(let i=0;i<n;i++){indexChunk(ix,corpus.chunks[i],i);if(i%1500===1499){onProgress(i/n);await new Promise(r=>setTimeout(r))}}
+  return finishIndex(ix);
 }
 function search(ix,qterms,boostDocs){
   const sc=new Float32Array(ix.N), k1=1.2,b=.75;
@@ -1748,7 +1753,9 @@ async function askInit(){
   if(navigator.onLine) fetchManifest().then(m=>{askState.remote=m;renderAskBar()}).catch(()=>{});
 }
 async function unlock(pass,silent){
-  try{askState.busy=true;renderAskBar();const data=await decryptKB(askState.stored.buf,pass);KB=data;KBidx=buildIndex(data);if($("#kb-remember")?.checked!==false)store.set("pqc-kbpass",pass);askState.msg=""}
+  try{askState.busy=true;askState.prog=-1;renderAskBar();const data=await decryptKB(askState.stored.buf,pass);
+    if($("#kb-remember")?.checked!==false)store.set("pqc-kbpass",pass);
+    KBidx=await buildIndexAsync(data,p=>{askState.prog=p;renderAskBar()});KB=data;askState.msg=""}
   catch(e){if(!silent)askState.msg=e.message;store.set("pqc-kbpass","")}
   askState.busy=false;renderAskBar();
 }
@@ -1757,6 +1764,7 @@ function renderAskBar(){
   const newer=s.remote&&s.stored&&s.remote.version!==s.stored.version;
   let h="";
   if(KB) h=`<div class="kbok"><b>Library ready</b><span>${KB.docs.filter(d=>d.kind==="SAES").length} SAES · ${KB.docs.filter(d=>d.kind==="SAEP").length} SAEP · ${KB.chunks.length.toLocaleString()} clauses · built ${KB.built.slice(0,10)}</span></div>${newer?`<button class="btn primary" id="kb-dl">Download the new version (${s.remote.documents} documents)</button>`:""}`;
+  else if(s.stored&&s.busy) h=`<div class="kbok"><b>${s.prog<0?"Unlocking library…":"Preparing library "+Math.round(s.prog*100)+"%"}</b><span>This takes a few seconds each time the app opens. Field book answers work meanwhile.</span></div><div class="kbprog"><i style="width:${Math.max(3,(s.prog<0?0:s.prog)*100)}%"></i></div>`;
   else if(s.stored) h=`<div class="kbok"><b>Library downloaded</b><span>Enter your passphrase once to unlock it on this phone.</span></div><form id="kb-unlock" class="row"><input type="password" id="kb-pass" placeholder="Library passphrase" autocomplete="current-password" style="flex:1;min-width:180px"><button class="btn primary" ${s.busy?"disabled":""}>${s.busy?"Unlocking…":"Unlock"}</button></form><label class="toggle" style="font-size:13px"><input type="checkbox" id="kb-remember" checked> Remember on this phone</label>`;
   else h=`<div class="kbok"><b>Study notes only</b><span>${s.remote?`A library of ${s.remote.documents} documents is available.`:"Answers come from this app's field book until your SAES and SAEP library is published."}</span></div>${s.remote?`<button class="btn primary" id="kb-dl">Download library (${(s.remote.bytes/1048576).toFixed(1)} MB)</button>`:""}`;
   el.innerHTML=h+(s.msg?`<p class="kberr">${esc(s.msg)}</p>`:"");
