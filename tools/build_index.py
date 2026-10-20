@@ -25,6 +25,7 @@ ITERATIONS = 250_000
 MAX_CHUNK = 1400  # characters per clause piece
 
 DOC_ID = re.compile(r"(SAES|SAEP|SAMSS|SAIC|SATIP|SATR|GI)[-_ ]?([A-Z]{0,2})[-_ ]?(\d{1,4}(?:\.\d+)?)", re.I)
+# HEADING kept for reference
 HEADING = re.compile(r"^\s*((?:\d{1,2}\.){0,5}\d{1,2}\.?|Appendix\s+[A-Z0-9]+|APPENDIX\s+[A-Z0-9]+|Table\s+\d+[A-Z]?)\s{1,4}([A-Z][^\n]{2,90})$")
 
 
@@ -69,45 +70,108 @@ def iter_zip(path):
 
 
 def clean(line):
-    line = line.replace(" ", " ").replace("‐", "-").replace("‑", "-")
+    line = line.replace(" ", " ").replace("‐", "-").replace("‑", "-").replace("–", "-").replace("’", "'")
+    line = re.sub(r"_{3,}", " ", line)
     return re.sub(r"[ \t]+", " ", line).strip()
 
 
+NOISE = re.compile(
+    r"^(document responsibility|issue date|next planned update|previous issue|saudi aramco: company general use|"
+    r"revised paragraphs are indicated|contact:|copyright|©|engineering (standard|procedure)$|page \d+ of \d+$|contents$|"
+    r"saudi aramco desktop standards|this document is|developed by)", re.I)
+
+
 def is_noise(line, doc):
-    low = line.lower()
-    return (not line or re.fullmatch(r"(page\s*)?\d+(\s*of\s*\d+)?", low) is not None
-            or "saudi aramco: company general use" in low or low.startswith("document responsibility")
-            or (doc.lower() in low and len(line) < len(doc) + 40 and re.search(r"issue date|next planned|page \d", low) is not None))
+    if len(line) < 2 or re.fullmatch(r"(page\s*)?\d+(\s*of\s*\d+)?", line, re.I):
+        return True
+    if NOISE.search(line) or re.search(r"\.{5,}\s*\d*$", line):  # page furniture, contents leaders
+        return True
+    # "SAEP-351 11 January 2017" cover line
+    return doc.lower() in line.lower() and re.search(r"\d{4}\s*$", line) is not None and len(line) < len(doc) + 25
+
+
+NUM = re.compile(r"^(\d{1,2}(?:\.\d{1,2}){0,5})(\.?)\s+(\S.*)$")
+APPX = re.compile(r"^(Appendix\s+[A-Z0-9]{1,3})\s*[-:–]?\s*(.*)$", re.I)
+SKIP_SECTIONS = re.compile(r"^(references|applicable documents|revision summary|contents)$", re.I)
+
+
+def is_title(text):
+    """Short title-like text: 'Scope', 'Tightening Sequence', 'Saudi Aramco References'."""
+    return (len(text) <= 60 and not re.search(r"[.;:,]$", text) and text[:1].isupper() and len(text.split()) <= 9
+            and not re.search(r"\b(shall|should|must|may|is|are|be|will|can|not)\b", text, re.I))
 
 
 def split_doc(doc, pages):
-    """Split page texts into clause chunks: {c: clause, h: heading, p: page, t: text}."""
-    chunks, cur = [], {"c": "", "h": "Introduction", "p": 1, "lines": []}
+    """Split page texts into clause chunks {c: clause no., h: section title, p: page, t: text}.
+    Every numbered paragraph starts a clause; the heading is the nearest section title."""
+    clauses, cur = [], None
+    title, sub, skipping, last_top, in_appx = "Introduction", None, False, 0, False
 
-    def flush():
-        text = " ".join(cur["lines"]).strip()
-        text = re.sub(r"\s+", " ", text)
+    def start(num, pno, text):
+        nonlocal cur
+        cur = {"c": num, "h": sub or title, "p": pno, "lines": [text] if text else []}
+        clauses.append(cur)
+
+    in_toc = False
+    for pno, page in enumerate(pages, 1):
+        raw_lines = [clean(r) for r in page.splitlines()]
+        leaders = sum(1 for l in raw_lines if re.search(r"\.{2,}\s*\d+\s*$", l))
+        if in_toc and leaders == 0:
+            in_toc = False
+        for line in raw_lines:
+            if re.fullmatch(r"(table of )?contents", line, re.I):
+                in_toc = True  # the contents list runs to the end of the page (and on, while leaders continue)
+            if in_toc or is_noise(line, doc):
+                continue
+            m, a = NUM.match(line), APPX.match(line)
+            top = m and "." not in m.group(1)
+            ok = m and 0 < int(m.group(1).split(".")[0]) <= 40 and not re.match(r"^\d", m.group(3))
+            first = int(m.group(1).split(".")[0]) if m else 0
+            if a and (not a.group(2) or is_title(a.group(2))):
+                title, sub, skipping, in_appx = (a.group(1) + (" - " + a.group(2) if a.group(2) else "")), None, False, True
+                start(a.group(1), pno, "")
+            elif ok and top and m.group(2) == "" and is_title(m.group(3)) and not in_appx and (first == last_top + 1 or (last_top == 0 and first <= 2)):
+                # top-level sections run 1, 2, 3 ... ; numbered checklist items don't
+                title, sub, last_top = m.group(3), None, first
+                skipping = bool(SKIP_SECTIONS.match(title))
+                if not skipping:
+                    start(m.group(1), pno, "")
+            elif skipping:
+                continue
+            elif ok and not top and not in_appx and first == last_top:
+                if is_title(m.group(3)):
+                    sub = m.group(3)
+                    start(m.group(1), pno, "")
+                else:
+                    start(m.group(1), pno, m.group(3))
+            elif cur is None:
+                start("", pno, line)
+            else:
+                cur["lines"].append(line)
+
+    # merge tiny neighbouring clauses under the same title, then cap length
+    merged = []
+    for cl in clauses:
+        text = re.sub(r"\s+", " ", " ".join(cl["lines"])).strip()
+        if not text:
+            continue
+        prev = merged[-1] if merged else None
+        if prev and prev["h"] == cl["h"] and len(prev["t"]) + len(text) < 700 and cl["c"] and prev["c"]:
+            prev["t"] += " (" + cl["c"] + ") " + text
+            prev["c"] = prev["c"].split("-")[0] + "-" + cl["c"]
+        else:
+            merged.append({"c": cl["c"], "h": cl["h"], "p": cl["p"], "t": text})
+    chunks = []
+    for ch in merged:
+        text = ch["t"]
         while text:
             piece = text[:MAX_CHUNK]
             if len(text) > MAX_CHUNK:
                 cut = piece.rfind(". ")
                 if cut > MAX_CHUNK * 0.5:
                     piece = piece[: cut + 1]
-            chunks.append({"c": cur["c"], "h": cur["h"], "p": cur["p"], "t": piece.strip()})
+            chunks.append({**ch, "t": piece.strip()})
             text = text[len(piece):].strip()
-
-    for pno, page in enumerate(pages, 1):
-        for raw in page.splitlines():
-            line = clean(raw)
-            if is_noise(line, doc):
-                continue
-            m = HEADING.match(line)
-            if m and not re.search(r"\d{3,}\s*(psi|kpa|mm)", line, re.I):
-                flush()
-                cur = {"c": m.group(1).rstrip("."), "h": m.group(2).strip(), "p": pno, "lines": []}
-            else:
-                cur["lines"].append(line)
-    flush()
     return [c for c in chunks if len(c["t"]) > 25]
 
 
@@ -123,6 +187,10 @@ def read_pdf(name, data):
 
 
 def title_of(pages, doc):
+    for page in pages[1:3]:
+        m = re.search(r"Next Planned Update:\s*\d{1,2}\s+\w+,?\s+\d{4}\s+(.+)", page)
+        if m and len(clean(m.group(1))) > 5:
+            return clean(m.group(1))[:120]
     for line in "\n".join(pages[:1]).splitlines():
         line = clean(line)
         if len(line) > 12 and doc.lower() not in line.lower() and not re.search(r"saudi aramco|issue date|page|engineering standard|engineering procedure|document responsibility|^\d", line, re.I):

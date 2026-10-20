@@ -355,10 +355,15 @@ mark{background:color-mix(in srgb,var(--k8) 35%,transparent);color:inherit;borde
 .askctx span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .askctx button{border:0;background:none;color:var(--k0);font-weight:700;cursor:pointer;white-space:nowrap}
 .askform{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;background:var(--paper);padding:6px 0}
-.askform input{font:500 16px var(--body);color:var(--ink);background:var(--card);border:2px solid var(--line);border-radius:14px;padding:12px 14px;width:100%}
-.askform input:focus{border-color:var(--k0);outline:none}
+.askform input,.kbbar input{font:500 16px var(--body);color:var(--ink);background:var(--card);border:2px solid var(--line);border-radius:14px;padding:12px 14px;width:100%}
+.askform input:focus,.kbbar input:focus{border-color:var(--k0);outline:none}
 
 .kbprog{height:6px;border-radius:3px;background:var(--line,#ddd);overflow:hidden;margin-top:8px}.kbprog i{display:block;height:100%;background:var(--k1);transition:width .2s}
+.aibar{margin-top:10px;padding-top:10px;border-top:1px solid var(--line);font-size:14px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.aibar>span{flex:1 1 200px;color:var(--muted)}.aibar>span b{color:var(--ink)}.aibar form{width:100%}.aibar a{color:var(--k0)}
+.src1 .srch{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:baseline}
+.src1 details summary{font-size:13px;color:var(--k0);cursor:pointer}
+.bot.ai .aitext p{margin:.4em 0}.bot.ai .aih{font-weight:700;margin-top:.8em}
 
 </style>
 </head>
@@ -383,7 +388,7 @@ mark{background:color-mix(in srgb,var(--k8) 35%,transparent);color:inherit;borde
   </section>
   <section class="view" id="v-ask" hidden>
     <div class="panel kbbar" id="kbbar"></div>
-    <div id="chat" class="chat"><div class="bot"><p><b>Ask anything about piping QC.</b> I search your SAES and SAEP library and this app's field book, then give a short answer with clause numbers and a cross-check between documents. It all works offline.</p>
+    <div id="chat" class="chat"><div class="bot"><p><b>Ask anything about piping QC.</b> I search your SAES and SAEP library and this app's field book. Online, with your API key, you get a written answer that cross-checks the documents and cites each clause. Offline, you get the clauses that match best.</p>
       <div class="row more" id="askexamples"><button class="chipbtn" data-ask="Hydrotest hold time">Hydrotest hold time</button><button class="chipbtn" data-ask="Test relief valve setting">Test relief valve setting</button><button class="chipbtn" data-ask="Gauge range and calibration">Gauge range and calibration</button><button class="chipbtn" data-ask="Spring hanger stops during test">Spring hanger stops during test</button><button class="chipbtn" data-ask="Lay-up after hydrotest">Lay-up after hydrotest</button><button class="chipbtn" data-ask="Bolt tightening passes">Bolt tightening passes</button></div></div></div>
     <div class="askdock"><div class="askctx" id="askctx" hidden><span></span><button type="button" aria-label="Start a new question">✕ new topic</button></div>
     <form id="askform" class="askform"><input id="askq" type="search" placeholder="e.g. hydrotest hold time for plant piping" autocomplete="off" enterkeyhint="send"><button class="btn primary" aria-label="Ask">Ask</button></form></div>
@@ -1685,10 +1690,11 @@ $("#startdate").addEventListener("change",e=>{store.set("pqc-start",e.target.val
 /* ---------- Ask: offline search across SAES / SAEP and the field book ---------- */
 const KB_URL="kb/", KB_DB="pqc-kb";
 const STOP=new Set("a an the of to in on for and or is are be by with as at from that this it its what which who how when where why do does did shall should must may can will per than then there their into any all not no".split(" "));
-const SYN={hydrotest:["hydrostatic","hydro","strength"],hydro:["hydrostatic","hydrotest"],psv:["relief","safety"],prv:["relief"],relief:["psv"],rv:["relief"],gasket:["gaskets"],bolt:["bolting","stud","torque"],bolting:["bolt","torque","tightening"],torque:["tightening","bolting"],mtc:["certificate","mill"],pmi:["positive","alloy","verification"],ncr:["nonconformance","nonconforming"],layup:["lay","preservation","mothball"],lay:["layup"],tp:["test","pressure"],dp:["design","pressure"],smys:["yield","strength"],flush:["flushing","cleaning"],clean:["cleaning","flushing"],weep:["hole"],deadleg:["dead","leg"],spring:["hanger","support"],hanger:["spring","support"],blind:["blinds","spectacle"],reinstatement:["reinstate","restoration"],punch:["punchlist"],itp:["inspection","plan"],hold:["witness"],gauge:["gage","gauges"],gage:["gauge"],pneumatic:["air","gas"]};
+const SYN={hold:["duration","maintained","held","witness"],time:["duration","hours","minutes"],duration:["hold","held","maintained"],gauge:["gage","recorder","gauges"],calibration:["calibrated"],calibrated:["calibration"],tightening:["torque","tensioning","bolt-up"],pass:["sequence","stage"],passes:["sequence","stage"],velocity:["flow","rate"],allowed:["permitted","not"],hydrotest:["hydrostatic","hydro","test"],hydro:["hydrostatic","hydrotest"],psv:["relief","safety"],prv:["relief"],relief:["psv"],rv:["relief"],gasket:["gaskets"],bolt:["bolting","stud","torque"],bolting:["bolt","torque","tightening"],torque:["tightening","bolting"],mtc:["certificate","mill"],pmi:["positive","alloy","verification"],ncr:["nonconformance","nonconforming"],layup:["lay","preservation","mothball"],lay:["layup"],tp:["test","pressure"],dp:["design","pressure"],smys:["yield","strength"],flush:["flushing","cleaning"],clean:["cleaning","flushing"],weep:["hole"],deadleg:["dead","leg"],spring:["hanger","support"],hanger:["spring","support"],blind:["blinds","spectacle"],reinstatement:["reinstate","restoration"],punch:["punchlist"],itp:["inspection","plan"],gage:["gauge"],pneumatic:["air","gas"]};
+for(const k of Object.keys(SYN)){const sk=stem(k);if(sk!==k&&!SYN[sk])SYN[sk]=SYN[k]}  // look-ups use stemmed words
 const QTY=/(\d+(?:[.,]\d+)?)\s*(%|psig|psi|kpa|mpa|bar|mm|inch(?:es)?|in\b|°\s?c|deg\s?c|minutes?|min\b|hours?|hrs?\b|h\b|days?|ppm|ppb|years?|m\/s|µm)/gi;
 let KB=null, KBidx=null, askCtx=null;
-const stem=w=>w.length>4?w.replace(/(ing|ed|es|s)$/,""):w;
+function stem(w){if(w.length<=4||/\d/.test(w))return w;if(/(sses|xes|ches|shes|zes)$/.test(w))return w.slice(0,-2);if(/ies$/.test(w))return w.slice(0,-3)+"y";if(/ing$/.test(w)&&w.length>6)return w.slice(0,-3);if(/ed$/.test(w)&&w.length>5)return w.slice(0,-2);if(/[^su]s$/.test(w))return w.slice(0,-1);return w}
 function toks(s){return String(s).toLowerCase().replace(/saes[-\s]?([a-z])[-\s]?(\d+)/g,"saes$1$2").replace(/saep[-\s]?(\d+)/g,"saep$1").replace(/[^a-z0-9.\s%]/g," ").replace(/(\D)\.|\.(\D|$)/g,"$1 $2").split(/\s+/).filter(w=>w&&!STOP.has(w)).map(stem)}
 function docKey(id){return toks(id).join("")}
 
@@ -1701,7 +1707,7 @@ function fieldBookCorpus(){
 function indexChunk(ix,ch,i){
   const tf=new Map(), add=(w,k)=>tf.set(w,(tf.get(w)||0)+k);
   const tt=toks(ch.t); tt.forEach(w=>add(w,1)); toks(ch.h).forEach(w=>add(w,2));
-  add(docKey(ix.corpus.docs[ch.d].id),1);
+  const dd=ix.corpus.docs[ch.d]; add(docKey(dd.id),1); if(dd.kind!=="NOTES") toks(dd.title||"").forEach(w=>add(w,1));
   ix.len.push(tt.length+4);
   tf.forEach((n,w)=>{let a=ix.post.get(w);if(!a)ix.post.set(w,a=[]);a.push(i,n)});
 }
@@ -1767,60 +1773,145 @@ function renderAskBar(){
   else if(s.stored&&s.busy) h=`<div class="kbok"><b>${s.prog<0?"Unlocking library…":"Preparing library "+Math.round(s.prog*100)+"%"}</b><span>This takes a few seconds each time the app opens. Field book answers work meanwhile.</span></div><div class="kbprog"><i style="width:${Math.max(3,(s.prog<0?0:s.prog)*100)}%"></i></div>`;
   else if(s.stored) h=`<div class="kbok"><b>Library downloaded</b><span>Enter your passphrase once to unlock it on this phone.</span></div><form id="kb-unlock" class="row"><input type="password" id="kb-pass" placeholder="Library passphrase" autocomplete="current-password" style="flex:1;min-width:180px"><button class="btn primary" ${s.busy?"disabled":""}>${s.busy?"Unlocking…":"Unlock"}</button></form><label class="toggle" style="font-size:13px"><input type="checkbox" id="kb-remember" checked> Remember on this phone</label>`;
   else h=`<div class="kbok"><b>Study notes only</b><span>${s.remote?`A library of ${s.remote.documents} documents is available.`:"Answers come from this app's field book until your SAES and SAEP library is published."}</span></div>${s.remote?`<button class="btn primary" id="kb-dl">Download library (${(s.remote.bytes/1048576).toFixed(1)} MB)</button>`:""}`;
-  el.innerHTML=h+(s.msg?`<p class="kberr">${esc(s.msg)}</p>`:"");
+  el.innerHTML=h+(s.msg?`<p class="kberr">${esc(s.msg)}</p>`:"")+aiBarHtml();
 }
+/* ---------- AI answers (online, the person's own Anthropic API key) ---------- */
+const AI_MODEL="claude-opus-5-5", AI_SDK="https://cdn.jsdelivr.net/npm/@anthropic-ai/sdk@0.131.0/+esm";
+let aiHist=[], aiEditing=false;
+const aiKey=()=>store.get("pqc-aikey",""), aiOn=()=>!!aiKey()&&store.get("pqc-aion",true);
+function aiBarHtml(){
+  const k=aiKey();
+  if(aiEditing||!k) return `<div class="aibar"><b>AI answers when online</b><span>Paste your Anthropic API key to get written answers that read across documents. Get one at <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">console.anthropic.com</a>. It's stored only on this phone.</span>
+    <form id="ai-key" class="row"><input type="password" id="ai-keyin" placeholder="sk-ant-…" autocomplete="off" style="flex:1;min-width:180px"><button class="btn primary">Save key</button>${k?`<button type="button" class="btn" id="ai-cancel">Cancel</button>`:""}</form></div>`;
+  return `<div class="aibar row"><span><b>AI answers</b> ${aiOn()?(navigator.onLine?"on":"on when online"):"off"}</span><button type="button" class="btn" id="ai-toggle">${aiOn()?"Turn off":"Turn on"}</button><button type="button" class="btn" id="ai-edit">Change key</button></div>`;
+}
+$("#kbbar")?.addEventListener("click",e=>{
+  if(e.target.id==="ai-toggle"){store.set("pqc-aion",!aiOn());renderAskBar()}
+  if(e.target.id==="ai-edit"){aiEditing=true;renderAskBar()}
+  if(e.target.id==="ai-cancel"){aiEditing=false;renderAskBar()}
+});
+$("#kbbar")?.addEventListener("submit",e=>{if(e.target.id!=="ai-key")return;e.preventDefault();e.stopImmediatePropagation();const v=$("#ai-keyin").value.trim();if(v){store.set("pqc-aikey",v);store.set("pqc-aion",true)}aiEditing=false;renderAskBar()},true);
+window.addEventListener("online",renderAskBar);window.addEventListener("offline",renderAskBar);
 $("#kbbar")?.addEventListener("click",async e=>{if(e.target.id!=="kb-dl")return;e.target.disabled=true;e.target.textContent="Downloading…";try{await downloadKB();askState.stored=await kvGet("index");KB=null;const p=store.get("pqc-kbpass","");if(p)await unlock(p,true);askState.remote=askState.stored.manifest}catch(err){askState.msg=err.message}renderAskBar()});
 $("#kbbar")?.addEventListener("submit",e=>{e.preventDefault();const p=$("#kb-pass").value;if(p)unlock(p)});
 
-function isFollowUp(q,tt){return askCtx&&(tt.length<=3||/^(and|but|what about|how about|also|same|is that|are you sure|why|what if|for|then|does that|so)\b/i.test(q.trim()))}
-function answer(q){
-  const tt=toks(q); if(!tt.length) return;
-  const follow=isFollowUp(q,tt);
+function isFollowUp(q){return !!askCtx&&/^(and|but|what about|how about|also|same|is that|is it|are you sure|why|what if|then|does that|does it|so|in that case|which one|for that|it|that|this|they|those)\b/i.test(q.trim())}
+function retrieve(q,follow){
+  const tt=toks(q); if(!tt.length) return null;
   const terms=new Map(); const put=(w,x)=>terms.set(w,Math.max(terms.get(w)||0,x));
   tt.forEach(w=>{put(w,1);(SYN[w]||[]).forEach(s=>put(stem(s),.5))});
   if(follow) askCtx.terms.forEach(([w,x])=>put(w,x*.6));
   const qterms=[...terms]; const boost=new Set();
   (q.match(/(saes|saep)[-\s]?[a-z]?[-\s]?\d+/gi)||[]).forEach(m=>boost.add(docKey(m)));
   if(follow) askCtx.boost.forEach(x=>boost.add(x));
+  const core=[...new Set(tt.concat(follow?askCtx.core:[]))];
+  const askWhich=/\bwhich\b.*\b(standard|saes|saep|procedure|document|spec)/i.test(q);
   const sources=[];
-  if(KBidx) search(KBidx,qterms,boost).slice(0,60).forEach(([s,i])=>sources.push({s,ix:KBidx,ch:KBidx.corpus.chunks[i]}));
-  search(fbIndex(),qterms,new Set()).slice(0,8).forEach(([s,i])=>sources.push({s:s*(KBidx?.55:1),ix:fbIndex(),ch:fbIndex().corpus.chunks[i]}));
+  if(KBidx) search(KBidx,qterms,boost).slice(0,800).forEach(([s,i])=>sources.push({s,ix:KBidx,ch:KBidx.corpus.chunks[i]}));
+  search(fbIndex(),qterms,new Set()).slice(0,10).forEach(([s,i])=>sources.push({s:s*(KBidx?.6:1),ix:fbIndex(),ch:fbIndex().corpus.chunks[i]}));
   const pairs=[];for(let i=0;i+1<tt.length;i++)pairs.push(tt[i]+" "+tt[i+1]);
-  if(pairs.length) sources.forEach(r=>{const j=" "+toks(r.ch.h+" "+r.ch.t).join(" ")+" ";let n=0;pairs.forEach(p=>{if(j.includes(" "+p+" "))n++});r.s*=1+.35*n});
+  sources.forEach(r=>{
+    const body=toks(r.ch.t), head=new Set(toks(r.ch.h)), have=new Set(body);
+    // coverage: clauses that contain all the question's words beat ones that repeat one word
+    const hit=core.filter(w=>have.has(w)||head.has(w)||(SYN[w]||[]).some(x=>have.has(stem(x)))).length;
+    r.s*=Math.pow((hit+.5)/(core.length+.5),3);
+    r.s*=1+.6*core.filter(w=>head.has(w)).length/Math.max(1,core.length);
+    if(pairs.length){const j=" "+body.join(" ")+" ";let n=0;pairs.forEach(p=>{if(j.includes(" "+p+" "))n++});r.s*=1+.5*n}
+    if(body.length<12) r.s*=.5;
+    if(/form|data sheet|checklist|sample|record/i.test(r.ch.h)) r.s*=.6;
+    if(askWhich&&r.ch.h==="Introduction") r.s*=4;
+  });
   sources.sort((a,b)=>b.s-a.s);
   const per=new Map(), top=[];
-  for(const r of sources){const d=r.ix.corpus.docs[r.ch.d].id, n=per.get(d)||0; if(n>=3) continue; per.set(d,n+1); top.push(r); if(top.length>=9) break;}
-  askCtx={q:follow?askCtx.q+" → "+q:q,terms:qterms.filter(([w,x])=>x>=.5).map(([w,x])=>[w,Math.min(x,1)]),boost:[...boost]};
-  addTurn(q,top,qterms,follow);
+  for(const r of sources){const d=r.ix.corpus.docs[r.ch.d].id, n=per.get(d)||0; if(n>=3) continue; per.set(d,n+1); top.push(r); if(top.length>=14) break;}
+  return {top,qterms,boost,core};
 }
-function sentencesOf(t){return t.split(/(?<=[.;])\s+(?=[A-Z(])/).map(s=>s.trim()).filter(s=>s.length>15)}
+function answer(q){
+  const follow=isFollowUp(q);
+  const R=retrieve(q,follow); if(!R) return;
+  askCtx={q:follow?askCtx.q+" → "+q:q,terms:R.qterms.filter(([w,x])=>x>=.5).map(([w,x])=>[w,Math.min(x,1)]),boost:[...R.boost],core:R.core.slice(-8)};
+  if(!follow) aiHist=[];
+  $("#askctx").hidden=false; $("#askctx span").textContent="Follow-ups build on: "+askCtx.q;
+  if(aiOn()&&navigator.onLine&&R.top.length) aiTurn(q,R,follow); else addTurn(q,R,follow);
+}
+function sentencesOf(t){return t.split(/(?<=[.;:])\s+(?=[A-Z(•\-a-z]\)?|\d+\.\s)/).map(s=>s.trim()).filter(s=>s.length>3)}
 function cite(r){const d=r.ix.corpus.docs[r.ch.d];return d.kind==="NOTES"?"Field book · "+r.ch.h:`${d.id}${r.ch.c?" §"+r.ch.c:""}`}
 function highlight(t,set){return esc(t).replace(/[A-Za-z0-9.%]+/g,w=>set.has(stem(w.toLowerCase()))?`<mark>${w}</mark>`:w)}
-function addTurn(q,top,qterms,follow){
-  const box=$("#chat"), set=new Set(qterms.map(x=>x[0])), ix0=KBidx||fbIndex();
-  let html=`<div class="me">${follow?`<span class="ctx">follow-up</span>`:""}${esc(q)}</div>`;
-  if(!top.length){html+=`<div class="bot"><p>I couldn't find that in ${KB?"your library or the field book":"the field book"}. Try other words, a document number (for example SAES-L-150), or a shorter question.</p></div>`;box.insertAdjacentHTML("beforeend",html);box.lastElementChild.scrollIntoView({behavior:"smooth",block:"start"});return}
-  // summary: best sentences across the top clauses, preferring different documents
-  const cands=[];top.forEach((r,ri)=>sentencesOf(r.ch.t).forEach(s=>{const w=new Set(toks(s));let sc=0;qterms.forEach(([t,x])=>{if(w.has(t))sc+=x*idfOf(r.ix,t)});if(QTY.test(s))sc*=1.15;QTY.lastIndex=0;if(sc>0)cands.push({s,sc:sc*(1-ri*.04),r})}));
-  cands.sort((a,b)=>b.sc-a.sc); const pickS=[],usedDoc=new Map();
-  for(const c of cands){const d=cite(c.r);if((usedDoc.get(d)||0)>=2||pickS.some(p=>p.s===c.s))continue;pickS.push(c);usedDoc.set(d,(usedDoc.get(d)||0)+1);if(pickS.length>=4)break}
-  // cross-check: same unit, values from different documents
-  const units=new Map();
-  top.forEach(r=>{const d=r.ix.corpus.docs[r.ch.d];sentencesOf(r.ch.t).forEach(s=>{const w=new Set(toks(s));if(![...set].some(t=>w.has(t)))return;for(const m of s.matchAll(QTY)){let u=m[2].toLowerCase().replace(/\s/g,"").replace(/^deg/,"°").replace(/^(minutes?|min)$/,"min").replace(/^(hours?|hrs?|h)$/,"h").replace(/^days?$/,"days").replace(/^inch(es)?$/,"in").replace(/^years?$/,"years");if(!units.has(u))units.set(u,new Map());const mm=units.get(u);const k=d.kind==="NOTES"?"Field book":d.id;if(!mm.has(k))mm.set(k,new Set());mm.get(k).add(m[1].replace(",",""))}})});
-  const rows=[...units].filter(([u,m])=>m.size>=2).slice(0,4);
-  const docsTop=[...new Map(top.map(r=>[r.ix.corpus.docs[r.ch.d].id,r])).values()];
-  html+=`<div class="bot"><div class="ahead"><span class="eyebrow">Answer from ${docsTop.length} document${docsTop.length>1?"s":""}</span></div>
-  <ul class="asum">${pickS.map(c=>`<li>${highlight(c.s,set)} <span class="cite">${esc(cite(c.r))}</span></li>`).join("")}</ul>
-  ${rows.length?`<div class="xcheck"><b>Cross-check across documents</b>${rows.map(([u,m])=>{const vals=[...m.values()].map(v=>[...v].sort().join("/"));const agree=vals.every(v=>v===vals[0]);return `<div class="xrow ${agree?"ok":"diff"}"><span>${agree?"✓ agree":"⚠ differ"} · ${esc(u)}</span>${[...m].map(([d,v])=>`<em>${esc(d)}: ${esc([...v].join(", "))} ${esc(u)}</em>`).join("")}</div>`}).join("")}<p class="muted" style="font-size:12px">Different values can be for different cases (size, service, test type). Read the clauses before you quote one.</p></div>`:`<p class="muted" style="font-size:12px">${docsTop.length>1?"No conflicting numbers found between these documents.":"Only one document matched, so there's nothing to cross-check."}</p>`}
-  <details class="srcs"><summary>Sources (${top.length} clauses)</summary>${top.map(r=>{const d=r.ix.corpus.docs[r.ch.d];return `<div class="src1"><div><b>${esc(d.kind==="NOTES"?"Field book":d.id)}</b>${r.ch.c?` §${esc(r.ch.c)}`:""} · ${esc(r.ch.h)}${r.ch.p?` · p. ${r.ch.p}`:""}</div>${d.title&&d.kind!=="NOTES"?`<div class="muted" style="font-size:12px">${esc(d.title)}</div>`:""}<p>${highlight(r.ch.t,set)}</p>${r.ch.fb?`<button class="btn" data-open="${r.ch.fb}">Open topic</button>`:""}</div>`}).join("")}</details>
-  <div class="row more">${["Are you sure?","Which standard says this?","What about stainless?"].map(t=>`<button class="chipbtn" data-ask="${esc(t)}">${esc(t)}</button>`).join("")}${[...new Set(top.slice(1,5).map(r=>r.ch.h).filter(h=>h&&h!=="Introduction"&&h!==top[0].ch.h))].slice(0,2).map(h=>`<button class="chipbtn" data-ask="${esc(h)}">${esc(h)}</button>`).join("")}</div></div>`;
+/* the part of a clause that matches best: a few whole sentences around the densest hit */
+function snippet(r,set){
+  const ss=sentencesOf(r.ch.t); if(r.ch.t.length<=480) return r.ch.t;
+  let best=0,bi=0; ss.forEach((x,i)=>{const w=toks(x);let n=0;w.forEach(t=>{if(set.has(t))n++});const sc=n/Math.sqrt(w.length+3);if(sc>best){best=sc;bi=i}});
+  let a=bi,b=bi,len=ss[bi].length; while(len<380&&(a>0||b<ss.length-1)){if(b<ss.length-1){b++;len+=ss[b].length}if(len<380&&a>0){a--;len+=ss[a].length}}
+  return (a>0?"… ":"")+ss.slice(a,b+1).join(" ")+(b<ss.length-1?" …":"");
+}
+function srcCard(r,set,open){const d=r.ix.corpus.docs[r.ch.d];const full=r.ch.t.length>480;
+  return `<div class="src1"><div class="srch"><span class="cite">${esc(d.kind==="NOTES"?"Field book":d.id)}${r.ch.c?` §${esc(r.ch.c)}`:""}</span> <b>${esc(r.ch.h)}</b>${r.ch.p?` <span class="muted">p. ${r.ch.p}</span>`:""}</div>${d.title&&d.kind!=="NOTES"?`<div class="muted" style="font-size:12px">${esc(d.title)}</div>`:""}
+  <p>${highlight(open?r.ch.t:snippet(r,set),set)}</p>${full&&!open?`<details><summary>Full clause</summary><p>${highlight(r.ch.t,set)}</p></details>`:""}${r.ch.fb?`<button class="btn" data-open="${r.ch.fb}">Open topic</button>`:""}</div>`}
+function moreChips(top){return `<div class="row more">${["Are you sure?","Which standard says this?"].map(t=>`<button class="chipbtn" data-ask="${esc(t)}">${esc(t)}</button>`).join("")}${[...new Set(top.slice(1,6).map(r=>r.ch.h).filter(h=>h&&h.length<48&&h!=="Introduction"&&h!==top[0].ch.h))].slice(0,2).map(h=>`<button class="chipbtn" data-ask="${esc(h)}">${esc(h)}</button>`).join("")}</div>`}
+function meBubble(q,follow){return `<div class="me">${follow?`<span class="ctx">follow-up</span>`:""}${esc(q)}</div>`}
+function addTurn(q,R,follow){
+  const box=$("#chat"), top=R.top, set=new Set(R.qterms.map(x=>x[0]));
+  let html=meBubble(q,follow);
+  if(!top.length){html+=`<div class="bot"><p>I couldn't find that in ${KB?"your library or the field book":"the field book"}. Try other words, a document number (for example SAES-L-150), or a shorter question.</p></div>`}
+  else{
+    const why=!aiKey()?"Add an API key above to get a written AI answer when you're online.":!aiOn()?"AI answers are off.":"You're offline, so here are the clauses that match best. Ask again online for a written answer.";
+    html+=`<div class="bot"><div class="ahead"><span class="eyebrow">Best matching clauses</span></div><p class="muted" style="font-size:13px">${why}</p>
+    ${top.slice(0,4).map(r=>srcCard(r,set)).join("")}
+    ${top.length>4?`<details class="srcs"><summary>${top.length-4} more clauses</summary>${top.slice(4).map(r=>srcCard(r,set)).join("")}</details>`:""}
+    ${moreChips(top)}</div>`;
+  }
   box.insertAdjacentHTML("beforeend",html);
   box.lastElementChild.previousElementSibling.scrollIntoView({behavior:"smooth",block:"start"});
-  $("#askctx").hidden=false; $("#askctx span").textContent="Follow-ups build on: "+askCtx.q;
 }
-$("#askform").addEventListener("submit",e=>{e.preventDefault();const q=$("#askq").value.trim();if(!q)return;$("#askq").value="";answer(q);markActive()});
+/* small, safe markdown: escape first, then bold, bullets and clause citations */
+function mdLite(t){
+  const lines=esc(t).split("\n"); let out="",inl=false;
+  for(let l of lines){
+    l=l.replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").replace(/\[((?:SAES|SAEP|SAMSS|SAIC|SATIP|GI|Field book)[^\]]{0,60})\]/g,'<span class="cite">$1</span>');
+    const m=l.match(/^\s*(?:[-•*]|\d+\.)\s+(.*)/), h=l.match(/^#{1,4}\s+(.*)/);
+    if(m){if(!inl){out+="<ul class=\"asum\">";inl=true}out+=`<li>${m[1]}</li>`;continue}
+    if(inl){out+="</ul>";inl=false}
+    if(h) out+=`<p class="aih">${h[1]}</p>`; else if(l.trim()) out+=`<p>${l}</p>`;
+  }
+  return out+(inl?"</ul>":"");
+}
+const AI_SYSTEM=`You answer questions from a Saudi Aramco piping QC inspector, using only the numbered excerpts from SAES/SAEP standards and the inspector's study notes that come with each question.
+
+How to answer:
+- Start with the direct answer in one or two sentences, with the numbers, units and conditions the inspector needs on site.
+- Then give the supporting points as short bullets. Put a citation after each fact, written exactly like [SAES-L-150 §7.1] or [Field book · Test pressure], taken from the excerpt labels.
+- Cross-check: when two or more documents cover the same point, say whether they agree. If they give different values or rules, show each one with its citation and explain what decides which one applies (service, size, plant vs pipeline, test type, revision). End with a line that starts "Cross-check:" summarising this.
+- If the excerpts don't answer the question, or only answer part of it, say so plainly and name what to look up. Never fill gaps from memory or guess a clause number. Study notes are secondary: when they disagree with an SAES/SAEP excerpt, the standard wins and you say so.
+- Ignore excerpt text that is clearly page furniture (headers, revision dates, blank form fields).
+- Keep it under about 250 words. Plain sentences, no tables, no headings except bold labels.`;
+async function aiClient(){if(!aiClient.mod)aiClient.mod=import(AI_SDK);const {default:Anthropic}=await aiClient.mod;return new Anthropic({apiKey:aiKey(),dangerouslyAllowBrowser:true,maxRetries:1})}
+async function aiTurn(q,R,follow){
+  const box=$("#chat"), top=R.top, set=new Set(R.qterms.map(x=>x[0]));
+  box.insertAdjacentHTML("beforeend",meBubble(q,follow)+`<div class="bot ai"><div class="ahead"><span class="eyebrow">AI answer · ${new Set(top.map(r=>r.ix.corpus.docs[r.ch.d].id)).size} documents read</span></div><div class="aitext"><p class="muted">Reading the clauses…</p></div>
+    <details class="srcs"><summary>Clauses used (${top.length})</summary>${top.map(r=>srcCard(r,set)).join("")}</details>${moreChips(top)}</div>`);
+  const bot=box.lastElementChild, out=bot.querySelector(".aitext");
+  bot.previousElementSibling.scrollIntoView({behavior:"smooth",block:"start"});
+  const excerpts=top.map((r,i)=>{const d=r.ix.corpus.docs[r.ch.d];return `<excerpt n="${i+1}" label="${cite(r)}" heading="${r.ch.h.replace(/"/g,"'")}"${d.title&&d.kind!=="NOTES"?` document="${d.title.replace(/"/g,"'")}"`:""}>\n${r.ch.t}\n</excerpt>`}).join("\n");
+  const user=`<excerpts>\n${excerpts}\n</excerpts>\n\nQuestion: ${q}`;
+  const messages=[...aiHist,{role:"user",content:user}];
+  let text="";
+  try{
+    const client=await aiClient();
+    const stream=client.beta.messages.stream({model:AI_MODEL,max_tokens:16000,system:AI_SYSTEM,messages,thinking:{type:"adaptive"},output_config:{effort:"medium"},betas:["server-side-fallback-2026-07-01"],fallbacks:"default"});
+    stream.on("text",d=>{text+=d;out.innerHTML=mdLite(text)});
+    const msg=await stream.finalMessage();
+    if(msg.stop_reason==="refusal"&&!text) throw new Error("The AI declined this question. The matching clauses are below.");
+    if(!text) text=msg.content.filter(b=>b.type==="text").map(b=>b.text).join("");
+    out.innerHTML=mdLite(text);
+    aiHist=[...aiHist,{role:"user",content:`(Earlier question) ${q}`},{role:"assistant",content:text}].slice(-6);
+  }catch(e){
+    const st=e?.status, why=st===401?"Your API key wasn't accepted. Check it under AI answers above.":st===429?"The AI is busy or your key hit its limit. Try again in a minute.":st===400&&/credit/i.test(e.message||"")?"Your Anthropic account has no credit left.":e?.message&&!st?"Couldn't reach the AI ("+e.message+").":"The AI request failed"+(st?" ("+st+")":"")+".";
+    out.innerHTML=`<p class="kberr">${esc(why)} Here are the best matching clauses instead.</p>`+top.slice(0,3).map(r=>srcCard(r,set)).join("");
+  }
+}
+$("#askform").addEventListener("submit",e=>{e.preventDefault();const q=$("#askq").value.trim();if(!q)return;$("#askq").value="";$("#askq").blur();answer(q);markActive()});
 $("#chat").addEventListener("click",e=>{const a=e.target.closest("[data-ask]");if(a){answer(a.dataset.ask);return}const o=e.target.closest("[data-open]");if(o)openTopic(o.dataset.open)});
-$("#askctx button").addEventListener("click",()=>{askCtx=null;$("#askctx").hidden=true});
+$("#askctx button").addEventListener("click",()=>{askCtx=null;aiHist=[];$("#askctx").hidden=true});
 $("#askexamples").addEventListener("click",e=>{const b=e.target.closest("[data-ask]");if(b)answer(b.dataset.ask)});
 
 
