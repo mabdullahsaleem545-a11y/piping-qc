@@ -2,7 +2,7 @@
 
 An offline study app for Saudi Aramco piping QC inspectors, from material receiving to reinstatement. Welding QC is out of scope.
 
-It has a daily study routine, the field book with Recall mode, spaced-repetition flashcards, mixed quizzes, a hydrotest pressure calculator, the key numbers table and an 8-week plan.
+Pick any of the 34 topics across 9 sections. Each topic has key points as bullets, an animated site scene you can step through, a summary, then a 6-question quiz that unlocks the next topic. Each section ends with a recap (traps, interview line) and a 10-question test. Quizzes include reverse "which standard?" questions. There are also flip flashcards with spaced repetition, a hydrotest pressure calculator, a key numbers table and an 8-week plan.
 
 ## Install on iPhone
 
@@ -22,7 +22,7 @@ Progress is stored on the phone. Use **More → Back up your progress** to copy 
 | `icon-*.png` | App icons |
 | `fonts/` | Barlow Condensed, IBM Plex Sans and IBM Plex Mono (SIL Open Font License) |
 
-To publish an update, change the files and bump `CACHE` in `sw.js` (for example `piping-qc-v2`) so phones fetch the new version.
+To publish an update, change the files and bump `CACHE` in `sw.js` (for example `piping-qc-v3`) so phones fetch the new version.
 
 ## Source note
 

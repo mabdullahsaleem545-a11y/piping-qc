@@ -75,306 +75,274 @@
   src: url(fonts/IBMPlexSans.woff2) format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
-/* Layout: a field notebook. Sticky tab bar, one column of stage "tags" with point rows; values look like stencilled tag text. */
+/* Layout: a phone app. Each section has its own safety colour; topics open as a lesson (points → site scene → summary → quiz). */
 :root{
-  --paper:#EEF1EE; --card:#FFFFFF; --ink:#13263A; --muted:#5B6976; --line:#D3DAD6;
-  --steel:#2F5D7C; --steel-soft:#E1EAF0;
-  --tag:#E3A21A; --tag-soft:#FBEFD2; --tag-ink:#7A4E00;
-  --good:#2E7D4F; --good-soft:#E2F1E7; --bad:#B3261E; --bad-soft:#F7E3E1;
+  --paper:#F3F5F7; --card:#FFFFFF; --ink:#13263A; --muted:#5B6976; --line:#D9DFE4;
+  --k0:#3654D1; --k1:#0F9D6E; --k2:#E8590C; --k3:#0B8FA8; --k4:#C2255C; --k5:#1C7ED6; --k6:#7048E8; --k7:#E03131; --k8:#E0A100;
+  --water:#2F8FE0; --good:#2E9D57; --good-soft:#E3F5E9; --bad:#D63B30; --bad-soft:#FBE5E3;
+  --steelL:#E9EEF2; --steelM:#AAB6C1; --steelD:#6F7F8E; --soil:#E9DFC9; --soilD:#CDBE9D;
+  --vest:#FF7A1A; --helmet:#FFFFFF; --skin:#C98E62; --navy:#24364A;
+  --scene:#EAF3FB; --shadow:0 1px 2px rgba(19,38,58,.06),0 4px 14px rgba(19,38,58,.06);
   --display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
   --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --paper:#0E171E; --card:#15212B; --ink:#E5ECEF; --muted:#9AA9B5; --line:#283844;
-  --steel:#86B6D8; --steel-soft:#1C2E3B; --tag:#F0B23A; --tag-soft:#3A2C10; --tag-ink:#F6C766;
-  --good:#6CC28F; --good-soft:#163024; --bad:#F08A80; --bad-soft:#3A1C1A; color-scheme:dark}}
+  --paper:#0D151C; --card:#16222D; --ink:#E7EDF2; --muted:#9DAAB6; --line:#2A3946;
+  --k0:#6C86F0; --k1:#2FBF8A; --k2:#FF8A43; --k3:#2CB5CC; --k4:#E8598C; --k5:#4DA3F0; --k6:#9479F5; --k7:#F06A62; --k8:#F2BC2E;
+  --water:#4AA3F0; --good:#4CC27A; --good-soft:#15301F; --bad:#F06A62; --bad-soft:#3A1B19;
+  --steelL:#C9D3DB; --steelM:#8D9BA8; --steelD:#5B6A78; --soil:#3B3427; --soilD:#5A4E37;
+  --navy:#41566D; --scene:#132331; --shadow:none; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --paper:#0E171E; --card:#15212B; --ink:#E5ECEF; --muted:#9AA9B5; --line:#283844;
-  --steel:#86B6D8; --steel-soft:#1C2E3B; --tag:#F0B23A; --tag-soft:#3A2C10; --tag-ink:#F6C766;
-  --good:#6CC28F; --good-soft:#163024; --bad:#F08A80; --bad-soft:#3A1C1A; color-scheme:dark}
+  --paper:#0D151C; --card:#16222D; --ink:#E7EDF2; --muted:#9DAAB6; --line:#2A3946;
+  --k0:#6C86F0; --k1:#2FBF8A; --k2:#FF8A43; --k3:#2CB5CC; --k4:#E8598C; --k5:#4DA3F0; --k6:#9479F5; --k7:#F06A62; --k8:#F2BC2E;
+  --water:#4AA3F0; --good:#4CC27A; --good-soft:#15301F; --bad:#F06A62; --bad-soft:#3A1B19;
+  --steelL:#C9D3DB; --steelM:#8D9BA8; --steelD:#5B6A78; --soil:#3B3427; --soilD:#5A4E37;
+  --navy:#41566D; --scene:#132331; --shadow:none; color-scheme:dark}
 *{box-sizing:border-box}
-body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;margin:0}
-body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
-.wrap{max-width:980px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-header.top{padding-block:28px 14px}
-.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-h1{font-family:var(--display);font-weight:700;font-size:clamp(34px,6vw,52px);line-height:1;margin:6px 0 8px;letter-spacing:.01em;text-wrap:balance}
-.lede{max-width:66ch;color:var(--muted);margin:0}
-.today{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
-.stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 12px;display:flex;gap:8px;align-items:baseline}
-.stat b{font-family:var(--mono);font-size:18px;font-variant-numeric:tabular-nums}
-.stat span{color:var(--muted);font-size:13px}
-nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);border-bottom:1px solid var(--line)}
-nav.tabs .wrap{display:flex;gap:4px;overflow-x:auto;padding-block:8px;scrollbar-width:none}
-nav.tabs button{font:600 15px var(--display);letter-spacing:.04em;text-transform:uppercase;border:1px solid transparent;background:none;color:var(--muted);padding:8px 12px;border-radius:8px;cursor:pointer;white-space:nowrap}
-nav.tabs button[aria-selected="true"]{background:var(--ink);color:var(--paper)}
-nav.tabs button:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--tag);outline-offset:2px}
-main{padding-block:20px 60px}
-section.view{display:grid;gap:18px}
+html{-webkit-text-size-adjust:100%;background:var(--paper)}
+body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.5 var(--body);-webkit-tap-highlight-color:transparent;padding-bottom:calc(66px + env(safe-area-inset-bottom,0px))}
 [hidden]{display:none!important}
-h2{font-family:var(--display);font-weight:700;font-size:30px;line-height:1.05;margin:0;text-wrap:balance}
-h3{font-family:var(--display);font-weight:600;font-size:21px;margin:0;letter-spacing:.02em}
+button{font:inherit;color:inherit}
+.wrap{max-width:760px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--display);margin:0;line-height:1.08;text-wrap:balance}
+h2{font-size:28px} h3{font-size:21px;letter-spacing:.01em}
 p{margin:0}
 .muted{color:var(--muted)}
+.eyebrow{font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.btn{font:600 14px var(--body);border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 14px;border-radius:8px;cursor:pointer}
-.btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
-.btn.good{background:var(--good);border-color:var(--good);color:var(--paper)}
-.btn.bad{background:var(--bad);border-color:var(--bad);color:var(--paper)}
-.btn[disabled]{opacity:.45;cursor:default}
-/* stage picker */
-.stages{display:flex;gap:6px;flex-wrap:wrap}
-.stages button{font:600 14px var(--body);border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:6px 12px;cursor:pointer;display:flex;gap:6px;align-items:center}
-.stages button .n{font-family:var(--mono);font-size:12px;color:var(--muted)}
-.stages button[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
-.stages button .done{width:8px;height:8px;border-radius:50%;background:var(--line)}
-.stages button .done.on{background:var(--good)}
-/* tag (the mnemonic card) */
-.tagcard{position:relative;background:var(--tag-soft);border:1.5px solid var(--tag);border-radius:6px 14px 14px 6px;padding:14px 18px 14px 46px;display:grid;gap:4px}
-.tagcard::before{content:"";position:absolute;left:16px;top:50%;width:14px;height:14px;margin-top:-7px;border-radius:50%;background:var(--paper);border:1.5px solid var(--tag)}
-.tagcard .k{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--tag-ink)}
-.tagcard .m{font-family:var(--display);font-size:clamp(22px,4vw,30px);font-weight:700;line-height:1.1}
-.tagcard .x{color:var(--ink);font-size:14px}
-.stagehead{display:grid;gap:8px}
-.chunk{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
-.chunk > header{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line)}
-.chunk > header .c{font-family:var(--mono);font-size:12px;color:var(--muted)}
-.pts{list-style:none;margin:0;padding:0}
-.pt{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:4px 16px;padding:10px 16px;border-top:1px solid var(--line)}
-.pt:first-child{border-top:0}
-.pt .l{min-width:0}
-.pt .v{min-width:0;font-family:var(--mono);font-weight:500;font-size:14px;color:var(--ink);cursor:default}
-.pt .meta{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
-.src{font-family:var(--mono);font-size:11px;color:var(--steel);background:var(--steel-soft);border-radius:4px;padding:1px 6px}
-.flag{font-family:var(--mono);font-size:11px;color:var(--tag-ink);background:var(--tag-soft);border:1px solid var(--tag);border-radius:4px;padding:0 6px}
-.why{font-size:13px;color:var(--muted)}
-.why b{color:var(--ink);font-weight:600}
-@media (max-width:620px){.pt{grid-template-columns:minmax(0,1fr)}}
-body.recall .pt .v{filter:blur(6px);cursor:pointer;user-select:none;transition:filter .2s}
-body.recall .pt .v.shown{filter:none}
-.figure{padding:12px 16px 16px;border-top:1px solid var(--line);overflow-x:auto}
-.figure svg{display:block;width:100%;height:auto;min-width:520px;max-width:900px}
-.figure .cap{font-size:13px;color:var(--muted);margin-top:6px}
-svg text{font-family:var(--body)}
-svg .t-ink{fill:var(--ink)} svg .t-mut{fill:var(--muted)} svg .t-tag{fill:var(--tag-ink)} svg .t-mono{font-family:var(--mono)}
-svg .s-line{stroke:var(--muted)} svg .s-ink{stroke:var(--ink)} svg .s-grid{stroke:var(--line)}
-svg .f-card{fill:var(--card)} svg .f-tag{fill:var(--tag-soft)} svg .f-steel{fill:var(--steel-soft)} svg .f-good{fill:var(--good-soft)} svg .f-bad{fill:var(--bad-soft)}
-svg .s-tag{stroke:var(--tag)} svg .s-steel{stroke:var(--steel)} svg .s-good{stroke:var(--good)} svg .s-bad{stroke:var(--bad)}
-.traps{display:grid;gap:8px;padding:12px 16px;border-top:1px solid var(--line);background:var(--bad-soft)}
-.traps h4,.say h4{margin:0;font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase}
-.traps h4{color:var(--bad)}
-.traps ul{margin:0;padding-left:18px;display:grid;gap:4px}
-.say{padding:12px 16px;border-top:1px solid var(--line);background:var(--steel-soft);display:grid;gap:4px}
-.say h4{color:var(--steel)}
-.tbl{overflow-x:auto}
-table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
-th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
-th{font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
-td.mono{font-family:var(--mono)}
-/* flashcards */
-.cardbox{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;display:grid;gap:14px;min-height:260px;align-content:start}
-.cardbox .q{font-family:var(--display);font-size:clamp(24px,4vw,32px);font-weight:600;line-height:1.15;text-wrap:balance}
-.cardbox .a{font-family:var(--mono);font-size:18px;border-top:1px dashed var(--line);padding-top:12px}
-.boxes{display:flex;gap:6px;flex-wrap:wrap}
-.boxes .b{font-family:var(--mono);font-size:12px;border:1px solid var(--line);border-radius:6px;padding:4px 8px;background:var(--card)}
-.progress{height:6px;background:var(--line);border-radius:3px;overflow:hidden}
-.progress i{display:block;height:100%;background:var(--good);width:0;transition:width .3s}
-/* quiz */
-.opts{display:grid;gap:8px}
-.opt{text-align:left;font:500 15px var(--body);border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:10px 14px;cursor:pointer}
-.opt.right{background:var(--good-soft);border-color:var(--good)}
-.opt.wrong{background:var(--bad-soft);border-color:var(--bad)}
-/* calculator */
-.calc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:16px}
-@media (max-width:760px){.calc{grid-template-columns:minmax(0,1fr)}}
-.panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;display:grid;gap:12px;min-width:0}
-label.f{display:grid;gap:4px;font-size:13px;color:var(--muted)}
-select,input[type=number],input[type=date]{font:500 15px var(--body);color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:8px 10px;width:100%}
-.ladder{display:grid;gap:6px}
-.rung{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:8px 10px;border-radius:8px;border:1px solid var(--line)}
-.rung b{font-family:var(--mono);font-variant-numeric:tabular-nums}
-.rung.win{border-color:var(--tag);background:var(--tag-soft)}
-.rung.warn{border-color:var(--bad);background:var(--bad-soft)}
-/* plan grid */
-.cal{display:grid;grid-template-columns:auto repeat(7,minmax(0,1fr));gap:4px;font-size:12px;min-width:640px}
-.cal .h{font:600 11px var(--mono);color:var(--muted);text-transform:uppercase;padding:4px}
-.cal .d{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:6px;min-height:64px;display:grid;gap:3px;align-content:start}
-.cal .d .dn{font-family:var(--mono);color:var(--muted);font-size:11px}
-.chip{display:inline-block;border-radius:4px;padding:0 5px;font-size:11px;font-weight:600;line-height:18px}
-.chip.new{background:var(--ink);color:var(--paper)}
-.chip.rev{background:var(--steel-soft);color:var(--steel)}
-.chip.mock{background:var(--tag-soft);color:var(--tag-ink);border:1px solid var(--tag)}
-.chip.rest{color:var(--muted)}
-.methods{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
-.method{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;display:grid;gap:6px;align-content:start}
-.method .k{font-family:var(--mono);font-size:11px;color:var(--steel);letter-spacing:.08em;text-transform:uppercase}
-.note{border-left:3px solid var(--tag);padding:8px 12px;background:var(--card);border-radius:0 8px 8px 0;font-size:14px}
-.toggle{display:inline-flex;gap:8px;align-items:center;font-size:14px;cursor:pointer}
-.toggle input{width:18px;height:18px;accent-color:var(--tag)}
-/* animations */
-@keyframes draw{from{stroke-dashoffset:var(--len)}to{stroke-dashoffset:0}}
-.drawn{stroke-dasharray:var(--len);animation:draw 3.2s ease-out both}
-@keyframes pulse{0%,100%{opacity:.25}50%{opacity:1}}
-.flowdot{animation:pulse 5s infinite both}
-@keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-.fadein{animation:fadein 1.2s ease-out both}
-@media (prefers-reduced-motion:reduce){.drawn{animation:none;stroke-dasharray:none}.flowdot,.fadein{animation:none;opacity:1}*{transition:none!important}}
-.bolt{transition:fill .25s, stroke .25s}
-.bolt.hit{fill:var(--tag)!important;stroke:var(--tag-ink)!important}
-footer{color:var(--muted);font-size:13px;padding-block:24px 40px;border-top:1px solid var(--line)}
-/* ---------- app shell (iPhone) ---------- */
-html{-webkit-text-size-adjust:100%;background:var(--paper)}
-body{-webkit-tap-highlight-color:transparent;overscroll-behavior-y:none;padding-bottom:calc(64px + env(safe-area-inset-bottom,0px))}
-header.appbar{position:sticky;top:0;z-index:6;background:var(--paper);padding-top:env(safe-area-inset-top,0px);border-bottom:1px solid var(--line)}
+.stack{display:grid;gap:14px}
+main{padding-block:14px 30px}
+section.view{display:grid;gap:16px}
+.btn{min-height:44px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:12px;padding:10px 16px;font-weight:600;cursor:pointer}
+.btn.primary{background:var(--sc,var(--ink));border-color:transparent;color:#fff}
+.btn.big{width:100%;font-size:17px;padding:14px 18px;border-radius:14px}
+.btn.good{background:var(--good);border-color:transparent;color:#fff}
+.btn.bad{background:var(--bad);border-color:transparent;color:#fff}
+.btn:active{transform:scale(.98)}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--k8);outline-offset:2px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;display:grid;gap:12px;box-shadow:var(--shadow);min-width:0}
+/* app bar */
+header.appbar{position:sticky;top:0;z-index:6;background:var(--paper);padding-top:env(safe-area-inset-top,0px)}
 header.appbar .wrap{display:flex;align-items:center;gap:10px;min-height:52px}
-header.appbar h1{font-size:26px;margin:0;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-header.appbar .back{font:600 15px var(--body);background:none;border:0;color:var(--steel);padding:8px 4px;cursor:pointer}
-header.appbar .pill{font:600 12px var(--mono);border-radius:999px;padding:3px 9px;background:var(--steel-soft);color:var(--steel);white-space:nowrap}
+header.appbar h1{font-size:27px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.back{background:none;border:0;color:var(--k0);font-weight:600;font-size:16px;padding:8px 2px;cursor:pointer}
+.chip{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:3px 10px;font:600 12px var(--mono);background:color-mix(in srgb,var(--sc,var(--k0)) 14%,transparent);color:var(--sc,var(--k0))}
+/* bottom nav */
 nav.bottom{position:fixed;left:0;right:0;bottom:0;z-index:7;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
-nav.bottom .in{display:grid;grid-template-columns:repeat(5,1fr);max-width:640px;margin:0 auto}
+nav.bottom .in{display:grid;grid-template-columns:repeat(4,1fr);max-width:640px;margin:0 auto}
 nav.bottom button{display:grid;justify-items:center;gap:2px;background:none;border:0;padding:8px 0 6px;color:var(--muted);font:600 11px var(--body);cursor:pointer;position:relative}
-nav.bottom button svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-nav.bottom button[aria-selected="true"]{color:var(--ink)}
-nav.bottom button[aria-selected="true"] svg{stroke:var(--tag-ink)}
-nav.bottom .badge{position:absolute;top:4px;left:calc(50% + 6px);min-width:18px;height:18px;border-radius:9px;background:var(--bad);color:#fff;font:700 11px/18px var(--body);padding:0 5px}
-main{padding-block:16px 28px}
-.big{font-family:var(--display);font-weight:700;font-size:44px;line-height:1}
-.todayhead{display:grid;gap:6px}
-.routine{list-style:none;margin:0;padding:0;display:grid}
-.routine li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 14px;border-top:1px solid var(--line)}
-.routine li:first-child{border-top:0}
-.routine input{width:24px;height:24px;accent-color:var(--good)}
-.routine .t{font-weight:600}
-.routine .s{font-size:13px;color:var(--muted)}
-.routine li.on .t{text-decoration:line-through;color:var(--muted)}
-.menu{display:grid;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
-.menu button{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;text-align:left;background:none;border:0;border-top:1px solid var(--line);padding:14px 16px;font:500 16px var(--body);color:var(--ink);cursor:pointer}
+nav.bottom svg{width:25px;height:25px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+nav.bottom button[aria-selected="true"]{color:var(--k0)}
+.badge{position:absolute;top:3px;left:calc(50% + 6px);min-width:18px;height:18px;border-radius:9px;background:var(--bad);color:#fff;font:700 11px/18px var(--body);padding:0 5px}
+/* home */
+.hero{border-radius:20px;padding:18px;color:#fff;background:linear-gradient(135deg,var(--k0),var(--k3));display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:center}
+.hero h2{font-size:30px}
+.hero p{opacity:.92;font-size:14px}
+.ring{--p:0;width:84px;height:84px;border-radius:50%;background:conic-gradient(#fff calc(var(--p)*1%),rgba(255,255,255,.25) 0);display:grid;place-items:center}
+.ring b{width:66px;height:66px;border-radius:50%;background:rgba(0,0,0,.18);display:grid;place-items:center;font:700 18px var(--mono)}
+.cont{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;text-align:left;width:100%;background:var(--card);border:2px solid var(--sc);border-radius:16px;padding:14px;cursor:pointer;box-shadow:var(--shadow)}
+.cont .ic{width:44px;height:44px;border-radius:12px;background:var(--sc);color:#fff;display:grid;place-items:center;font:800 20px var(--display)}
+.cont b{font-family:var(--display);font-size:21px;display:block;line-height:1.1}
+.cont::after{content:"▶";color:var(--sc);font-size:18px}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;display:grid;cursor:pointer;text-align:left}
+.stat b{font:700 22px var(--mono)}
+.stat span{font-size:12px;color:var(--muted)}
+.sec{background:var(--card);border-radius:18px;overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow)}
+.sec > header{background:var(--sc);color:#fff;padding:14px 16px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:center}
+.sec .num{width:42px;height:42px;border-radius:12px;background:rgba(255,255,255,.22);display:grid;place-items:center;font:800 22px var(--display)}
+.sec h3{font-size:23px}
+.sec .tagline{font:600 12px var(--mono);opacity:.92;margin-top:2px}
+.sec .bar{height:6px;background:rgba(255,255,255,.3);border-radius:3px;margin-top:8px;overflow:hidden}
+.sec .bar i{display:block;height:100%;background:#fff;border-radius:3px}
+.tlist{list-style:none;margin:0;padding:0}
+.tlist button{width:100%;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;background:none;border:0;border-top:1px solid var(--line);padding:12px 16px;text-align:left;cursor:pointer}
+.tlist li:first-child button{border-top:0}
+.dot{width:26px;height:26px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font:700 12px var(--mono);color:var(--muted)}
+.dot.done{background:var(--sc);border-color:var(--sc);color:#fff}
+.dot.star{background:var(--k8);border-color:var(--k8);color:#fff}
+.tlist .tt{font-weight:600}
+.tlist .ts{font-size:12px;color:var(--muted)}
+.score{font:700 13px var(--mono);color:var(--sc)}
+.tlist .test .tt{color:var(--sc)}
+/* topic */
+.thero{border-radius:20px;padding:18px;background:var(--sc);color:#fff;display:grid;gap:6px;position:relative;overflow:hidden}
+.thero h2{font-size:32px}
+.thero .eyebrow{color:#fff;opacity:.85}
+.thero::after{content:"";position:absolute;right:-30px;top:-30px;width:140px;height:140px;border-radius:50%;border:18px solid rgba(255,255,255,.14)}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.steps a{display:grid;justify-items:center;gap:4px;font:600 11px var(--body);color:var(--muted);text-decoration:none}
+.steps a i{width:100%;height:5px;border-radius:3px;background:var(--line)}
+.steps a.on{color:var(--sc)} .steps a.on i{background:var(--sc)}
+.secthead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.secthead h3{display:flex;align-items:center;gap:8px}
+.secthead h3 .n{width:26px;height:26px;border-radius:8px;background:var(--sc);color:#fff;display:grid;place-items:center;font-size:16px}
+.bul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.bul li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:start}
+.bul li::before{content:"";width:10px;height:10px;border-radius:3px;background:var(--sc);margin-top:7px;transform:rotate(45deg)}
+.bul .lab{font-weight:600}
+.bul .val{display:inline;font:600 14px var(--mono);background:color-mix(in srgb,var(--sc) 13%,transparent);color:var(--ink);border-radius:6px;padding:1px 6px;box-decoration-break:clone;-webkit-box-decoration-break:clone;cursor:default}
+.bul .meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;align-items:center}
+.src{font:600 11px var(--mono);color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:0 6px}
+.why{font-size:13px;color:var(--muted)}
+.flag{font:600 11px var(--mono);color:var(--k8);border:1px solid var(--k8);border-radius:5px;padding:0 6px}
+body.recall .bul .val{filter:blur(6px);cursor:pointer;user-select:none;transition:filter .2s}
+body.recall .bul .val.shown{filter:none}
+.toggle{display:inline-flex;gap:8px;align-items:center;font-size:14px;cursor:pointer}
+.toggle input{width:20px;height:20px;accent-color:var(--sc,var(--k0))}
+/* scene */
+.scene{border-radius:16px;overflow:hidden;background:var(--scene);border:1px solid var(--line)}
+.scene svg{display:block;width:100%;height:auto}
+.scene svg text{font-family:var(--body)}
+.scene .cap{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:start;padding:12px 14px;background:var(--card);border-top:1px solid var(--line);min-height:72px}
+.scene .cap b{width:28px;height:28px;border-radius:50%;background:var(--sc);color:#fff;display:grid;place-items:center;font:700 13px var(--mono)}
+.scene .cap p{font-weight:500}
+.scene .ctl{display:flex;align-items:center;gap:6px;padding:0 14px 12px;background:var(--card)}
+.scene .ctl button{width:44px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--paper);cursor:pointer;font-size:20px;font-weight:700}
+.scene .ctl .pips{display:flex;gap:5px;flex:1;justify-content:center}
+.scene .ctl .pips i{width:8px;height:8px;border-radius:50%;background:var(--line)}
+.scene .ctl .pips i.on{background:var(--sc);width:20px;border-radius:4px}
+.scene [data-s],.scene [data-e]{transition:opacity .5s}
+.scene [data-m],.scene [data-init]{transition:transform 1.1s cubic-bezier(.4,0,.2,1)}
+.scene [data-m]:not([style*="transform-box"]){transform-box:fill-box;transform-origin:center}
+.scene .fillpath{transition:stroke-dashoffset 2.4s ease-in-out}
+.scene .dur3{transition-duration:2.2s}
+@keyframes flow{to{stroke-dashoffset:-36}} .flow{stroke-dasharray:12 10;animation:flow .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}} .spin{transform-box:fill-box;transform-origin:center;animation:spin 1s linear infinite}
+@keyframes bob{50%{transform:translateY(-6px)}} .bob{animation:bob 2s ease-in-out infinite}
+@keyframes blink{50%{opacity:.35}} .blink{animation:blink 1s step-end infinite}
+@keyframes pulse{50%{opacity:.45}} .pulse{animation:pulse 1.6s ease-in-out infinite}
+@keyframes drip{0%{transform:translateY(0);opacity:0}20%{opacity:1}100%{transform:translateY(-26px);opacity:0}} .drip{animation:drip 1.4s ease-out infinite}
+@keyframes spray{0%{transform:translate(0,0);opacity:0}25%{opacity:1}100%{transform:translate(0,-30px) scale(1.6);opacity:0}} .spray{transform-box:fill-box;animation:spray 1.2s ease-out infinite}
+@keyframes wob{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}} .wob{animation:wob 2.4s ease-in-out infinite}
+@keyframes bseq{0%,8%{fill:var(--k8)}14%,100%{fill:#5c6670}} .boltseq{animation:bseq 3.6s linear infinite}
+/* summary */
+.sum{border-radius:18px;padding:16px;background:color-mix(in srgb,var(--sc) 12%,var(--card));border:2px solid var(--sc);display:grid;gap:10px}
+.sum ol{margin:0;padding-left:0;list-style:none;display:grid;gap:8px;counter-reset:s}
+.sum li{counter-increment:s;display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;font-weight:500}
+.sum li::before{content:counter(s);width:24px;height:24px;border-radius:50%;background:var(--sc);color:#fff;display:grid;place-items:center;font:700 12px var(--mono)}
+.hook{font:700 22px var(--display);color:var(--sc)}
+.traps{background:var(--bad-soft);border-radius:14px;padding:14px;display:grid;gap:6px}
+.traps h4,.say h4{margin:0;font:700 12px var(--mono);letter-spacing:.08em;text-transform:uppercase}
+.traps h4{color:var(--bad)} .traps ul{margin:0;padding-left:18px}
+.say{background:color-mix(in srgb,var(--k0) 12%,var(--card));border-radius:14px;padding:14px;display:grid;gap:6px}
+.say h4{color:var(--k0)}
+/* quiz */
+.qtop{display:grid;gap:8px}
+.qbar{height:8px;background:var(--line);border-radius:4px;overflow:hidden}
+.qbar i{display:block;height:100%;background:var(--sc);transition:width .4s}
+.qcard{background:var(--card);border-radius:20px;padding:18px;display:grid;gap:14px;border:1px solid var(--line);box-shadow:var(--shadow)}
+.qcard .q{font:600 24px/1.2 var(--display);text-wrap:balance}
+.qcard .rule{font:600 15px/1.4 var(--mono);background:color-mix(in srgb,var(--sc) 12%,transparent);border-left:4px solid var(--sc);padding:10px 12px;border-radius:0 10px 10px 0}
+.qtype{justify-self:start}
+.opts{display:grid;gap:10px}
+.opt{min-height:52px;text-align:left;border:2px solid var(--line);background:var(--card);border-radius:14px;padding:12px 14px;font-weight:500;font-size:15px;cursor:pointer;display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:center}
+.opt .l{width:26px;height:26px;border-radius:8px;background:var(--paper);display:grid;place-items:center;font:700 13px var(--mono);color:var(--muted)}
+.opt.right{border-color:var(--good);background:var(--good-soft)} .opt.right .l{background:var(--good);color:#fff}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)} .opt.wrong .l{background:var(--bad);color:#fff}
+.opt.right{animation:pop .35s} .opt.wrong{animation:shake .35s}
+@keyframes pop{50%{transform:scale(1.03)}} @keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.fb{border-radius:12px;padding:10px 12px;font-size:14px}
+.fb.ok{background:var(--good-soft)} .fb.no{background:var(--bad-soft)}
+.result{display:grid;justify-items:center;gap:12px;text-align:center;padding:10px 0}
+.bigring{--p:0;width:150px;height:150px;border-radius:50%;background:conic-gradient(var(--sc) calc(var(--p)*1%),var(--line) 0);display:grid;place-items:center;animation:pop .6s}
+.bigring b{width:118px;height:118px;border-radius:50%;background:var(--card);display:grid;place-items:center;font:700 34px var(--mono)}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:20;overflow:hidden}
+.confetti i{position:absolute;top:-20px;width:9px;height:14px;border-radius:2px;animation:fall 2.4s ease-in forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+.hub{display:grid;gap:10px}
+.hubbtn{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;text-align:left;border:0;border-radius:16px;padding:16px;color:#fff;background:var(--sc);cursor:pointer}
+.hubbtn .ic{width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.22);display:grid;place-items:center;font:800 22px var(--display)}
+.hubbtn b{font:700 21px var(--display);display:block}
+.hubbtn span{font-size:13px;opacity:.92}
+.hubbtn::after{content:"▶"}
+/* flashcards */
+.flip{perspective:1200px;cursor:pointer}
+.flip .inner{position:relative;min-height:300px;transition:transform .6s;transform-style:preserve-3d}
+.flip.on .inner{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;border-radius:22px;padding:22px;display:grid;align-content:space-between;gap:12px;backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:var(--shadow)}
+.face.front{background:var(--sc);color:#fff}
+.face.back{background:var(--card);border:3px solid var(--sc);transform:rotateY(180deg)}
+.face .q{font:600 28px/1.15 var(--display);text-wrap:balance}
+.face .a{font:600 20px/1.35 var(--mono)}
+.face .eyebrow{color:inherit;opacity:.85}
+.grade{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grade .btn{padding:14px;font-size:16px}
+.boxes{display:flex;gap:6px;flex-wrap:wrap}
+.boxes span{font:600 12px var(--mono);border-radius:8px;padding:4px 8px;background:var(--card);border:1px solid var(--line)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;justify-self:start}
+.seg button{border:0;background:var(--card);padding:8px 14px;font-weight:600;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+select,input[type=number],input[type=date]{font:500 16px var(--body);color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:9px 10px;width:100%}
+label.f{display:grid;gap:4px;font-size:13px;color:var(--muted)}
+/* tools */
+.menu{display:grid;background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.menu button{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;text-align:left;background:none;border:0;border-top:1px solid var(--line);padding:14px 16px;font-size:16px;font-weight:600;cursor:pointer}
 .menu button:first-child{border-top:0}
 .menu button small{display:block;font-size:13px;color:var(--muted);font-weight:400}
+.menu .ic{width:36px;height:36px;border-radius:10px;background:var(--sc);color:#fff;display:grid;place-items:center;font:800 17px var(--display)}
 .menu button::after{content:"›";font-size:22px;color:var(--muted)}
-.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
-.seg button{border:0;background:var(--card);color:var(--ink);font:600 14px var(--body);padding:8px 14px;cursor:pointer}
-.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
-textarea{width:100%;min-height:110px;font:12px var(--mono);color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:8px}
-.ok{color:var(--good);font-weight:600}
-.installtip{display:grid;gap:6px}
-.installtip ol{margin:0;padding-left:20px;display:grid;gap:4px}
-.cardbox{touch-action:manipulation}
-.cardbox.tapflip{cursor:pointer}
-.cardbox .grade{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.cardbox .grade .btn{padding:14px 10px;font-size:15px}
-.btn{min-height:44px}
-.opt{min-height:48px}
-@media (max-width:620px){
-  .cardbox{padding:18px}
-  h2{font-size:26px}
-  .chunk > header{padding:10px 14px}
-  .pt{padding:10px 14px}
-}
-#v-today .today{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0}
-#v-today .stat{flex-direction:column;gap:0;align-items:flex-start;padding:10px 12px}
-#v-today .stat span{font-size:12px}
-.seg{justify-self:start}
+textarea{width:100%;min-height:100px;font:12px var(--mono);color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:8px}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+td.mono{font-family:var(--mono)}
+.nv.hid{filter:blur(6px)}
+/* reused tool styles */
+.calc{display:grid;gap:16px}
+.ladder{display:grid;gap:6px}
+.rung{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:8px 10px;border-radius:10px;border:1px solid var(--line)}
+.rung b{font-family:var(--mono)}
+.rung.win{border-color:var(--k8);background:color-mix(in srgb,var(--k8) 14%,transparent)}
+.rung.warn{border-color:var(--bad);background:var(--bad-soft)}
+.cal{display:grid;grid-template-columns:auto repeat(7,minmax(0,1fr));gap:4px;font-size:12px;min-width:640px}
+.cal .h{font:600 11px var(--mono);color:var(--muted);text-transform:uppercase;padding:4px}
+.cal .d{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px;min-height:64px;display:grid;gap:3px;align-content:start}
+.cal .d .dn{font-family:var(--mono);color:var(--muted);font-size:11px}
+.cal .chip{border-radius:5px;padding:0 5px;font:600 11px/18px var(--body)}
+.chip.new{background:var(--k0);color:#fff} .chip.rev{background:color-mix(in srgb,var(--k3) 18%,transparent);color:var(--k3)} .chip.mock{background:var(--k8);color:#13263A} .chip.rest{background:none;color:var(--muted)}
+#gauge text{font-family:var(--mono)}
+svg .t-ink{fill:var(--ink)} svg .t-mut{fill:var(--muted)} svg .t-mono{font-family:var(--mono)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
-#v-drill h2,#v-quiz h2{display:none}
 </style>
 </head>
 <body>
 <header class="appbar"><div class="wrap">
-  <button class="back" id="backbtn" hidden>‹ More</button>
-  <h1 id="apptitle">Today</h1>
-  <span class="pill" id="offpill" hidden>Offline ready</span>
+  <button class="back" id="backbtn" hidden>‹ Back</button>
+  <h1 id="apptitle">Piping QC</h1>
 </div></header>
-
 <main class="wrap">
-  <section class="view" id="v-today">
-    <div class="todayhead">
-      <div class="eyebrow" id="planday">8-week plan</div>
-      <div class="big" id="planhead">Ready when you are</div>
-      <p class="muted" id="plansub"></p>
+  <section class="view" id="v-learn"><div id="home" class="stack"></div></section>
+  <section class="view" id="v-topic" hidden><div id="topicbody" class="stack"></div></section>
+  <section class="view" id="v-recap" hidden><div id="recapbody" class="stack"></div></section>
+  <section class="view" id="v-run" hidden><div id="runbody" class="stack"></div></section>
+  <section class="view" id="v-cards" hidden>
+    <div class="row" style="justify-content:space-between;align-items:end">
+      <label class="f" style="flex:1;min-width:200px">Deck<select id="deck"></select></label>
+      <div class="seg" id="cmode"><button data-m="value">Value</button><button data-m="std">Which standard</button></div>
     </div>
-    <div class="today" id="today"></div>
-    <div class="panel" style="padding:0">
-      <div style="padding:14px 14px 4px"><h3>Today's routine</h3><p class="muted" style="font-size:13px">About 65 minutes. Tick each block when it's done.</p></div>
-      <ul class="routine" id="routine"></ul>
-    </div>
-    <div class="panel" id="streakbox"></div>
-    <div class="panel installtip" id="installtip" hidden>
-      <h3>Install on your iPhone</h3>
-      <ol>
-        <li>Open this page in <b>Safari</b>.</li>
-        <li>Tap the <b>Share</b> button (the square with an up arrow).</li>
-        <li>Scroll down and tap <b>Add to Home Screen</b>, then <b>Add</b>.</li>
-        <li>Open <b>Piping QC</b> from your Home Screen once while you're online. After that it works with no internet.</li>
-      </ol>
-    </div>
-  </section>
-
-  <section class="view" id="v-more" hidden>
-    <div class="menu">
-      <button data-open="calc"><span>Test pressure calculator<small>Pipe, flange and code limits, relief valve and gauge</small></span></button>
-      <button data-open="numbers"><span>Numbers to know cold<small>The values you'll be asked, in one table</small></span></button>
-      <button data-open="plan"><span>8-week plan<small>Learn and review days on a calendar</small></span></button>
-      <button data-open="method"><span>How to study<small>Why this app is built the way it is</small></span></button>
-      <button data-open="fixes"><span>What changed<small>Corrections and items to verify</small></span></button>
-    </div>
-    <div class="panel">
-      <h3>Appearance</h3>
-      <div class="seg" id="themeseg"><button data-t="auto">Auto</button><button data-t="light">Light</button><button data-t="dark">Dark</button></div>
-    </div>
-    <div class="panel">
-      <h3>Back up your progress</h3>
-      <p class="muted" style="font-size:14px">Your progress is saved on this phone only. Copy the backup code now and then and keep it in Notes. If you delete the app or change phones, paste it back here.</p>
-      <div class="row"><button class="btn primary" id="bk-copy">Copy backup code</button><button class="btn" id="bk-show">Paste a backup</button></div>
-      <div id="bk-area" hidden style="display:grid;gap:8px">
-        <textarea id="bk-text" placeholder="Paste your backup code here"></textarea>
-        <div class="row"><button class="btn good" id="bk-restore">Restore</button><span class="muted" id="bk-msg" style="font-size:13px"></span></div>
-      </div>
-    </div>
-    <div class="panel">
-      <h3>Offline</h3>
-      <p class="muted" style="font-size:14px" id="offtxt">Checking…</p>
-      <div class="row"><button class="btn" id="upd">Check for an update</button><button class="btn bad" id="reset">Reset all progress</button></div>
-    </div>
-    <p class="muted" style="font-size:12px">Saudi Aramco SAES, SAEP, SAIC, SATIP, SATR, GI and Schedule Q documents are proprietary and revised often. Clause numbers and values here come from the study deck and public codes. Check each against the current revision held by your project or inspection agency before quoting it. Welding QC is out of scope.</p>
-  </section>
-  <section class="view" id="v-learn">
-    <div class="row" style="justify-content:space-between">
-      <div class="stages" id="stagepick" aria-label="Stages"></div>
-    </div>
-    <div class="row" style="justify-content:space-between">
-      <label class="toggle"><input type="checkbox" id="recallmode"> Recall mode: hide the values, then tap each one to check yourself</label>
-      <button class="btn" id="markdone">Mark stage studied</button>
-    </div>
-    <div id="stagebody" style="display:grid;gap:16px"></div>
-  </section>
-
-  <section class="view" id="v-drill" hidden>
-    <div class="row" style="justify-content:space-between">
-      <h2>Flashcards</h2>
-      <div class="row">
-        <label class="f" style="min-width:220px">Deck<select id="deck"></select></label>
-      </div>
-    </div>
-    <p class="muted">Say the answer out loud before you flip. Cards you know move up a box and come back later (1, 2, 4, 8, 16, then 32 days). Cards you miss go back to box 1 and return tomorrow.</p>
     <div class="boxes" id="boxes"></div>
-    <div class="progress"><i id="drillbar"></i></div>
-    <div class="cardbox" id="card"></div>
+    <div id="card" class="stack"></div>
+    <p class="muted" style="font-size:13px">Say the answer out loud, then tap the card to flip it. Cards you know come back after 1, 2, 4, 8, 16 and 32 days. Cards you miss come back tomorrow.</p>
   </section>
-
-  <section class="view" id="v-quiz" hidden>
-    <div class="row" style="justify-content:space-between">
-      <h2>Quiz</h2>
-      <div class="row">
-        <label class="f" style="min-width:220px">Questions from<select id="qsrc"></select></label>
-        <button class="btn primary" id="qstart">New round of 10</button>
-      </div>
+  <section class="view" id="v-quiz" hidden><div id="hub" class="hub"></div></section>
+  <section class="view" id="v-tools" hidden>
+    <div class="menu" id="toolmenu">
+      <button data-open="calc" style="--sc:var(--k5)"><span class="ic">P</span><span>Test pressure calculator<small>Pipe, flange and code limits, relief valve and gauge</small></span></button>
+      <button data-open="numbers" style="--sc:var(--k8)"><span class="ic">#</span><span>Numbers to know cold<small>Every value in one table</small></span></button>
+      <button data-open="plan" style="--sc:var(--k1)"><span class="ic">8</span><span>8-week plan<small>Learn and review days on a calendar</small></span></button>
+      <button data-open="fixes" style="--sc:var(--k6)"><span class="ic">S</span><span>Sources and changes<small>Where the values come from, what to verify</small></span></button>
     </div>
-    <p class="muted">Rounds mix stages on purpose. Mixing is harder than studying one topic at a time, and that is why it sticks. A wrong answer sends the matching flashcard back to box 1.</p>
-    <div class="cardbox" id="qbox"></div>
+    <div class="panel"><h3>Appearance</h3><div class="seg" id="themeseg"><button data-t="auto">Auto</button><button data-t="light">Light</button><button data-t="dark">Dark</button></div></div>
+    <div class="panel"><h3>Back up your progress</h3><p class="muted" style="font-size:14px">Progress is saved on this phone only. Copy the backup code now and then and keep it in Notes. Paste it back after changing phones.</p>
+      <div class="row"><button class="btn primary" id="bk-copy">Copy backup code</button><button class="btn" id="bk-show">Paste a backup</button></div>
+      <div id="bk-area" hidden class="stack"><textarea id="bk-text" placeholder="Paste your backup code here"></textarea><div class="row"><button class="btn good" id="bk-restore">Restore</button><span class="muted" id="bk-msg" style="font-size:13px"></span></div></div></div>
+    <div class="panel"><h3>Offline</h3><p class="muted" style="font-size:14px" id="offtxt">Checking…</p><div class="row"><button class="btn" id="upd">Check for an update</button><button class="btn bad" id="reset">Reset all progress</button></div></div>
+    <p class="muted" style="font-size:12px">Saudi Aramco SAES, SAEP, SAIC, SATIP, SATR, GI and Schedule Q documents are proprietary and revised often. Values come from your study deck and public codes. Check each against the current revision your project or agency holds. Welding QC is out of scope.</p>
   </section>
-
   <section class="view" id="v-calc" hidden>
     <h2>Hydrotest pressure, step by step</h2>
     <p class="muted" style="max-width:70ch">Pick a line and see how the test pressure, relief valve and gauge are chosen. The rule is SAES-L-150 §7.1: 90% SMYS hoop stress in the pipe, unless a flange or valve limits it, and never below the B31.3 minimum.</p>
@@ -403,14 +371,12 @@ textarea{width:100%;min-height:110px;font:12px var(--mono);color:var(--ink);back
       </div>
     </div>
   </section>
-
   <section class="view" id="v-numbers" hidden>
     <h2>Numbers to know cold</h2>
     <p class="muted">Cover the value column with your hand and say each one. Tap a row to send it to today's flashcards.</p>
     <div class="row"><label class="toggle"><input type="checkbox" id="numhide"> Hide values</label></div>
     <div class="panel tbl"><table id="numtbl"></table></div>
   </section>
-
   <section class="view" id="v-plan" hidden>
     <h2>8 weeks, about 75 minutes a day</h2>
     <p class="muted" style="max-width:70ch">Each study day has three blocks: 25 minutes on new points (with Recall mode on), 30 minutes of due flashcards, and a 10-question mixed quiz. Each stage comes back for review 1, 3, 7, 14 and 30 days after you first study it. Those return days are marked below.</p>
@@ -428,48 +394,20 @@ textarea{width:100%;min-height:110px;font:12px var(--mono);color:var(--ink);back
       <tr><td class="mono">8</td><td>Interview practice: every "Say it in the interview" line, spoken and recorded</td><td>A friend asks 20 random questions, each answer under a minute with its standard</td></tr>
     </table></div>
   </section>
-
-  <section class="view" id="v-method" hidden>
-    <h2>How this page helps you remember</h2>
-    <p class="muted" style="max-width:70ch">Last time, reading the notes for three weeks did not stick. Reading feels productive but fades fast. Memory research points to a few habits that make learning last, and each tool on this page is built around one of them.</p>
-    <div class="panel figure" style="border-top:0">
-      <svg viewBox="0 0 760 250" role="img" aria-label="Memory fades after one study session but each spaced review flattens the curve">
-        <text x="20" y="24" class="t-ink" font-size="15" font-weight="600">Each spaced review makes the memory fade more slowly</text>
-        <text x="20" y="42" class="t-mut" font-size="12">Illustrative shape of the forgetting curve, not measured data</text>
-        <line x1="60" y1="210" x2="740" y2="210" class="s-grid" stroke-width="1"/>
-        <line x1="60" y1="60" x2="60" y2="210" class="s-grid" stroke-width="1"/>
-        <text x="54" y="66" class="t-mut" font-size="11" text-anchor="end">recall</text>
-        <text x="740" y="228" class="t-mut" font-size="11" text-anchor="end">days</text>
-        <path d="M60 64 C 90 150, 130 185, 740 200" fill="none" class="s-bad" stroke-width="2" stroke-dasharray="5 4"/>
-        <text x="300" y="196" class="t-mut" font-size="11">read once, never reviewed</text>
-        <path class="drawn" style="--len:1400" d="M60 64 C 75 100, 85 112, 100 116 L100 64 C 125 92, 150 102, 180 106 L180 64 C 220 82, 270 92, 340 96 L340 64 C 420 74, 520 82, 620 86 L620 64 C 660 66, 700 70, 740 72" fill="none" class="s-good" stroke-width="2.5"/>
-        <g class="t-ink" font-size="11" font-family="IBM Plex Mono, monospace">
-          <text x="100" y="56" text-anchor="middle">day 1</text><text x="180" y="56" text-anchor="middle">day 3</text><text x="340" y="56" text-anchor="middle">day 7</text><text x="620" y="56" text-anchor="middle">day 14+</text>
-        </g>
-      </svg>
-    </div>
-    <div class="methods" id="methods"></div>
-    <div class="note">A daily routine that uses all of these: <b>quiz first</b> (5 minutes, cold), <b>learn</b> one stage chunk with Recall mode on (25 minutes), <b>flashcards</b> that are due (30 minutes), then <b>explain one point aloud</b> as if to a new trainee (5 minutes). Sleep 7 or more hours, because memories are consolidated during sleep.</div>
-  </section>
-
   <section class="view" id="v-fixes" hidden>
     <h2>What changed after the review</h2>
     <p class="muted" style="max-width:70ch">I re-checked every point against your study deck (whose values were taken from the text of SAES-L-108, L-109, L-150, L-310, L-350, SAES-A-004, A-007, SAEP-351 and SAEP-1151) and against public ASME and API codes. Aramco standards are proprietary and I could not open the current issues from here, so points marked <span class="flag">verify</span> need a check against your agency's current revision.</p>
     <div class="panel tbl"><table id="fixtbl"></table></div>
   </section>
 </main>
-
 <nav class="bottom" aria-label="Sections"><div class="in" role="tablist" id="tabbar">
-  <button role="tab" data-v="today" aria-selected="true"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4M8 14l2.5 2.5L16 12"/></svg>Today</button>
-  <button role="tab" data-v="learn" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5M8 7h7M8 11h7"/></svg>Learn</button>
-  <button role="tab" data-v="drill" aria-selected="false"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="14" height="14" rx="2"/><path d="M7 3h12a2 2 0 0 1 2 2v12"/></svg>Cards<span class="badge" id="duebadge" hidden></span></button>
+  <button role="tab" data-v="learn" aria-selected="true"><svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5M8 7h7M8 11h7"/></svg>Learn</button>
+  <button role="tab" data-v="cards" aria-selected="false"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="14" height="14" rx="2"/><path d="M7 3h12a2 2 0 0 1 2 2v12"/></svg>Cards<span class="badge" id="duebadge" hidden></span></button>
   <button role="tab" data-v="quiz" aria-selected="false"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17.5v.01"/></svg>Quiz</button>
-  <button role="tab" data-v="more" aria-selected="false"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>More</button>
+  <button role="tab" data-v="tools" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/></svg>Tools</button>
 </div></nav>
 
 <script>
-/* ---------- content ---------- */
-// point: [label, value, source, why, flag]
 const S = [
 { id:"f", n:"0", name:"Foundation", tag:"Code, Standard, Procedure, Plan, Checklist, Report",
   tagx:"B31.3 sets the minimum. SAES raises it. SAEP says how. SATIP plans it. SAIC checks it. SATR records it.",
@@ -905,18 +843,6 @@ const MCQ = [
  ["x","A joint opened for the test is re-made with:",["The test gasket","A new gasket and bolt-up record","Any gasket","No gasket"],1,"SAES-A-004 §7.4"],
  ["x","Spring support stops are removed:",["Before the test","After the test, setting recorded","Never","At start-up only"],1,"SAES-L-310 §13.4"]
 ];
-
-const METHODS = [
- ["Retrieval practice","Testing yourself beats re-reading","Pulling an answer out of memory strengthens it much more than seeing it again (the testing effect, Roediger and Karpicke).","Recall mode blurs every value. Flashcards ask before they show. Each day starts with a cold quiz."],
- ["Spaced repetition","Review just before you forget","Reviews spread over growing gaps (1, 3, 7, 14, 30 days) beat the same time crammed in one sitting (Ebbinghaus; Cepeda and colleagues).","Flashcard boxes return at 1, 2, 4, 8, 16, 32 days. The plan marks each stage's review days."],
- ["Interleaving","Mix the topics","Switching between topics feels harder, but trains you to pick the right rule, which is what an interview needs (Rohrer and Taylor).","Quiz rounds draw from all stages you choose, in random order."],
- ["Chunking","Small groups of facts","Working memory holds about four chunks at once (Cowan). Grouping facts lets you hold more.","Each stage is split into chunks of about 5 to 9 points, each chunk with one job."],
- ["Dual coding","Words plus pictures","A fact stored as words and as an image has two routes back (Paivio).","Every stage has a diagram or animation: flange tolerances, the bolt star, the test profile, the lay-up decision."],
- ["Mnemonics","Hooks for lists","Short phrases and number strings make lists easy to rebuild.","Each stage opens with its tag: D-V-M-M-P, 3 · 1.5 · 2.4 · 1.6, 33 · 66 · 100 · 100, Blinds · Bolts · Bits · Back."],
- ["Elaboration","Know why, not just what","Linking a rule to its reason makes it easier to recall and to defend in an interview.","Many points carry a one-line reason. Say it aloud with the number."],
- ["Explain it aloud","Teach a trainee","Explaining in plain words shows the gaps you did not know you had (the Feynman technique).","Each stage ends with a line to say in the interview. Record yourself and listen back."]
-];
-
 const FIXES = [
  ["Removed","Weld joint fit-up items (bevel angle, root gap, hi-lo, tack welds, purge, preheat, welder cards), electrode storage, NDE and PWHT sections","These are welding QC duties. The only welding item kept is the weld summary you check before a test pack goes forward."],
  ["Removed","Socket-weld gap and socket-weld size limits","Socket welding is a welding QC check. Threaded-joint limits stay, because they are a piping joint check."],
@@ -932,258 +858,640 @@ const FIXES = [
  ["Added","SAEP-381 timings: NCR approval 5 working days, one extension up to 90 days, repeat rule","From the deck's SAEP-381 slide."],
  ["Flagged","SAIC and SATR numbers, Schedule Q layout","These change between revisions and contracts. Confirm on your project's current SATIP and contract."]
 ];
+const KEYN=[["Fit-up location","± 3 mm","L-350 §9.1"],["Branch offset","± 1.5 mm","L-350 §9.3"],["Flange bolt-hole rotation","± 2.4 mm","L-350 §9.4"],["Flange face tilt","≤ 1.6 mm","L-350 §9.4"],["Bend flattening","≤ 5% (3% at ends)","L-350 §9.2"],["Seamless mill tolerance","−12.5%","ASTM A106"],["Sour CS hardness","≤ 22 HRC","NACE MR0175"],["Min size, hazardous","¾ in","L-310 §9.2"],["Dead leg","3D or 1.22 m, lesser","L-310 §10.4"],["Small branch to obstruction","≥ 610 mm","L-310 §11.5"],["Pipe to structure / pipe","≥ 120 mm","L-310 §11.4"],["Buried cover / under roads","450 / 750 mm","L-310 §12.3.3"],["Dummy weep hole","6 mm","L-310 §13.7.2"],["Pump suction straight run","≥ 5D","L-310 §10.7"],["Machinery face tilt max","0.672 mm","L-350 §9.5"],["Bolt-up passes","33-66-100-100%","SAEP-351 §9.2"],["8-bolt order","1-5-3-7-2-6-4-8","SAEP-351 App. E"],["No hand wrench","bolts ≥ 1 in","SAEP-351 §8.4"],["Tool calibration","± 5%","SAEP-351 §8.2"],["Spiral-wound seat finish","3.2–6.4 µm Ra","SAEP-351"],["Hydro TP","90% SMYS unless components limit","L-150 §7.1"],["Cl 150 / 300 / 600 TP","450 / 1125 / 2225 psig","B16.5"],["Stand-off at TP","10 min","A-004 §6.1.2"],["Hold, plant / pipeline","30 min / 2 h","L-150"],["Preliminary check","½ TP or 170 kPa, lesser","A-004 §6.1.4"],["Test relief valve","TP + 5%","A-004 §5.7.1"],["Gauges","≥ 2, 30–80%, ≤ 30 days","A-004 §5.12.6"],["Manifold test","≥ 1.2 × TP","A-004 App. B"],["Pneumatic energy","≤ 271 MJ","A-004 App. A"],["HP water jet","≥ 60.8 MPa","L-350 App. A"],["HVWF velocity","≥ 3 m/s","L-350 App. A"],["Air blow velocity","≥ 15 m/s","L-350 App. A"],["PASB","≤ 810 kPa","L-350 App. A"],["SS chloride","≤ 50 ppm","A-007"],["SRB","≤ 1,000 /mL","A-007"],["Water pH","≥ 5.5","A-007"],["Lay-up trigger","30 d (14 HX, SS)","A-007 §7.1"],["Wet lay-up","20 ppm / 20 ppb / 30–50 psig","A-007 §7.4"],["Dry lay-up dew point","≤ −1 °C","A-007 §7.5"],["NCR approval","5 working days","SAEP-381"],["Records kept","≥ 5 years","A-004 §6.4"]];
 
-/* ---------- state ---------- */
-const store = {
-  get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},
-  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+/* ---------- end-of-topic summaries ---------- */
+const SUM={
+f0:["B31.3 is the base. SAES supplements it, and the stricter rule wins.","SAEP says how, SATIP becomes the ITP, SAIC is your checklist, SATR is your signed record.","A deviation from a SAES needs a written waiver (SAEP-302). Nothing verbal."],
+f1:["Hold point: work stops until the named authority releases it.","Witness point: notify in advance. If nobody attends, work may continue.","SAEP-1151 Levels 0–4 are vendor shop inspection levels, not site hold points."],
+f2:["The line list gives the fluid category.","Category D: non-flammable, non-toxic, ≤ 150 psig, −29 to 186 °C. Category M: toxic.","Slip-on flanges are allowed only in Category D."],
+f3:["Always cross-check the P&ID, the line list and the latest IFC isometric.","The test diagram gives limits, vents, drains and blinds.","If documents disagree, stop and raise an RFI. Never decide in the field."],
+r0:["D-V-M-M-P: Documents, Visual, Marking, MTC, PMI.","Pass: tag it and log the heat number. Fail: quarantine, hold tag, NCR.","Material substitution needs prior approval from Design, PMT, Inspection and Materials."],
+r1:["The heat number links the pipe to its MTC. Transfer it before every cut.","EN 10204 3.1 is the usual minimum. 3.2 adds third-party verification.","2.1 and 2.2 certificates have no actual heat results, so they are not enough for pressure parts."],
+r2:["PMI applies to every alloy item (API RP 578).","XRF can't read carbon. OES can, so OES tells 304 from 304L.","Failed PMI means quarantine the heat and raise an NCR."],
+r3:["CS: A106 B, A234 WPB, A105N, A216 WCB, B7/2H.","Low temp: A333 Gr 6, A420 WPL6, A350 LF2, A352 LCB, L7M/7M. Look for the L.","Sour service: CS ≤ 22 HRC, bolting B7M/2HM ≤ 235 HB."],
+r4:["The line class gives material, rating, facing, gasket, bolts and wall.","Sizes 1¼, 2½, 3½ and 5 in are not used.","Hazardous service: minimum ¾ in. Hydrocarbon ≤ 2 in: minimum Sch 80."],
+r5:["Check the nameplate, rating, trim, flow arrow and test certificate.","API 598: shell 1.5 × rating, high-pressure seat 1.1 × rating.","Soft seats: zero leakage. BW/SW valves ≤ NPS 2 are exempt from the site seat test."],
+st0:["Up, Capped, Apart: off the ground, ends capped, stainless kept apart.","Stainless stays away from seawater and is lifted with nylon slings.","Coated pipe is lifted with wide padded slings. Gaskets are stored flat and dry."],
+e0:["3 · 1.5 · 2.4 · 1.6: location ±3, branch ±1.5, rotation ±2.4, tilt 1.6 mm.","Bolt holes straddle both centrelines.","Bends: flattening ≤ 5% (≤ 3% at weld ends)."],
+e1:["Never put a branch or pad over a girth weld.","Pads: same material, tell-tale hole air-soap tested.","Threaded joints: ≤ 1½ in hazardous, ≤ 3 in non-hazardous. Flanges never carry the pipe."],
+e2:["Spring stops: IN for the hydrotest, OUT after, setting recorded.","Every support is per drawing and touching the pipe. Moving one needs approval.","Dummy supports need a 6 mm weep hole. No rod hangers on ≥ 12 in liquid lines."],
+e3:["Dead leg: longer than 3D or 1.22 m, whichever is less.","Clearances: 120 mm pipe to pipe, 300 mm to grade, 610 mm small branch to obstruction.","Buried: 450 mm cover, 750 mm under roads. Pump suction: eccentric reducer flat on top, 5D straight."],
+e4:["Flow arrows match the flow. Check valves ≥ 4 in: 5D up, 2D down.","PSV upright, inlet loss ≤ 3%, block valves car-sealed open.","Every vent or drain to atmosphere: valve plus plug or blind."],
+e5:["At machinery: bolts pass freely, gap = gasket ± 1.6 mm, offset ± 2.4 mm.","Face tilt max 0.672 mm (0.254 mm below 10 in OD).","Shaft movement ≤ 0.05 mm while bolting. Remove studs: alignment still holds."],
+b0:["Weld neck first. RF to Class 600, RTJ for Class 900+.","Spiral-wound: outer ring always, inner ring for ≥ 24 in, Class 900+, PTFE or vacuum.","Never RF to FF, never metal-jacketed gaskets, always a new gasket on an opened joint."],
+b1:["Approved procedure, certified bolter, tools calibrated ± 5%.","Nuts run free by hand. Lubricant on threads and nut face only.","Align first: parallel ≤ 0.8 mm, offset ≤ 1.5 mm, rotation ≤ 3 mm."],
+b2:["Star order 1-5-3-7-2-6-4-8.","Four passes: 33 · 66 · 100 · 100 %.","Bolts ≥ 1 in: hydraulic tool. Impact wrenches and hammering are prohibited."],
+b3:["Low ≤ 13: no record. Medium 14–18: recorded, 10% witnessed. High ≥ 19: all witnessed.","Critical joints get an App. I data sheet and a tag.","A bolter idle for 12 months is re-trained."],
+t0:["Three groups: engineering documents, construction records, test equipment records.","The approved procedure and pack are on site during the test.","Records are kept at least 5 years. Safety checklist plus work permit before the test."],
+t1:["Pipe limit 90% SMYS. Flange limit 1.5 × rating. Take the lowest.","Never below the code minimum of 1.5 × DP.","Class 150 / 300 / 600 test at 450 / 1125 / 2225 psig. Check static head at the lowest point."],
+t2:["At least 2 gauges, at the manifold and highest point, within 5% of each other.","TP sits at 30–80% of scale. Calibration within 30 days.","Relief valve at TP + 5%. Manifold tested ≥ 1.2 × TP."],
+t3:["Blinds of the system class. A block valve is a boundary only if it doesn't pass.","Out of the test: machinery, PSVs, rupture discs, CVs, orifices, meters, instruments.","Vents at high points, drains at low points, welds bare, check valve discs out."],
+t4:["Fill from the lowest point, vents open. Preliminary check at ½ TP or 25 psi, lesser.","At TP: 10 minutes stand-off, then hold ≥ 30 minutes (2 hours for pipelines).","Inspect at DP. A leak means depressurise, repair and retest. Never tighten under pressure."],
+t5:["Pneumatic strength test: written approval, ≤ 271 MJ, bubble test at 5–10 psi.","Instrument impulse lines: 1.1 × DP for 30 minutes.","A new weld after the test means a retest (seal welds on threads excepted)."],
+c0:["Remove orifices, CVs, flow elements and soft-seated valves before flushing.","Water flush ≥ 3 m/s, HP jet ≥ 60.8 MPa, air blow ≥ 15 m/s, PASB ≤ 810 kPa.","Never seawater. Stainless: chloride < 50 mg/L."],
+c1:["SRB ≤ 1,000 cells/mL, pH ≥ 5.5, no H₂S, 53 µm filter.","Stainless: chloride ≤ 50 ppm. Never use carbon-steel test water on stainless.","Sample each source within 2 weeks before filling."],
+c2:["Lay-up if start-up is more than 30 days after first fill (14 for HX and stainless).","Wet: 20 ppm scavenger, 20 ppb O₂. Dry: dew point −1 °C.","Hold at 30–50 psig. Never water in lube oil, seal oil or instrument air systems."],
+p0:["Punch A closes before the test. Punch B closes before handover.","YES items close before the MC certificate. NO items may stay open.","No painting before the hydrotest unless Inspection approves."],
+p1:["LBE for minor, NCR for moderate (any Schedule Q breach), WS for major.","An NCR has the requirement broken, root cause and corrective action.","Approval in 5 working days. One extension, up to 90 days. A repeat within 6 months goes up a level."],
+p2:["MC needs signed test packs, punch B and YES items closed, and lay-up in place.","Hydrotest and lay-up records go to PMT.","As-builts and dead-leg letters are handed over for the inspection programme."],
+x0:["Blinds · Bolts · Bits · Back.","Every opened joint: new gasket and a SAEP-351 record.","Check valve discs back the right way. Spring stops out. Vents and drains plugged."]
 };
-const today = Math.floor(Date.now()/864e5);
-const INT = [0,1,2,4,8,16,32];
-let srs = store.get("pqc-srs",{});
-let done = store.get("pqc-done",{});
-let cur = store.get("pqc-stage","f");
-if(!S.find(s=>s.id===cur)) cur="f";
+/* which topic (chunk) each hand-written MCQ belongs to, in MCQ order */
+const MCQ_CHUNK=[1,4,4,5,2,2,0,2,0,0,0,3,3,3,3,3,3,3,0,4,4,2,4,5,5,5,2,2,2,3,1,1,1,1,1,1,1,2,0,0,1,2,2,0,0,0,0,0,2,1,2,0,0,2,2,1,0,0,0,1,0,0];
 
-/* cards: one per point */
-const CARDS = [];
-S.forEach(s=>s.chunks.forEach((c,ci)=>c.p.forEach((p,pi)=>CARDS.push({id:s.id+"-"+ci+"-"+pi,s:s.id,stage:s.name,chunk:c.h,q:p[0],a:p[1],src:p[2],why:p[3]||""}))));
-const cardById = Object.fromEntries(CARDS.map(c=>[c.id,c]));
+/* ---------- scene kit: step-driven SVG animations of site work ----------
+   data-s="n"   visible from step n        data-e="n"  hidden from step n
+   data-init    starting CSS transform     data-m="n:transform|n:transform"  moves at step n
+   data-txt="n:text|n:text"  text that changes with the step
+   class flow / spin / bob / blink / drip / pulse  = continuous motion */
+const W_=640,H_=300;
+const at=a=>a?" "+a:"";
+const pipe=(x,y,w,h=26,a="")=>`<g${at(a)}><rect x="${x}" y="${y-h/2}" width="${w}" height="${h}" rx="3" fill="url(#gSteel)" stroke="var(--steelD)" stroke-width="1.2"/><rect x="${x+2}" y="${y-h/2+3}" width="${w-4}" height="${Math.max(2,h*.16)}" rx="1" fill="#fff" opacity=".35"/></g>`;
+const vpipe=(x,y,h,w=26,a="")=>`<g${at(a)}><rect x="${x-w/2}" y="${y}" width="${w}" height="${h}" rx="3" fill="url(#gSteelV)" stroke="var(--steelD)" stroke-width="1.2"/></g>`;
+const flange=(x,y,h=60,a="")=>`<rect${at(a)} x="${x-5}" y="${y-h/2}" width="10" height="${h}" rx="2" fill="url(#gSteelV)" stroke="var(--steelD)" stroke-width="1.2"/>`;
+const valve=(x,y,a="",c="var(--k3)")=>`<g${at(a)}><path d="M${x-20} ${y-15}L${x} ${y}L${x-20} ${y+15}Z M${x+20} ${y-15}L${x} ${y}L${x+20} ${y+15}Z" fill="${c}" stroke="var(--ink)" stroke-width="1.5" stroke-linejoin="round"/><line x1="${x}" y1="${y}" x2="${x}" y2="${y-28}" stroke="var(--ink)" stroke-width="3"/><ellipse cx="${x}" cy="${y-30}" rx="15" ry="4" fill="none" stroke="var(--k7)" stroke-width="3"/></g>`;
+const man=(x,y,a="",vest="var(--vest)")=>`<g${at(a)}><rect x="${x-9}" y="${y-30}" width="7" height="30" rx="2" fill="var(--navy)"/><rect x="${x+2}" y="${y-30}" width="7" height="30" rx="2" fill="var(--navy)"/><rect x="${x-13}" y="${y-63}" width="26" height="36" rx="6" fill="${vest}"/><rect x="${x-13}" y="${y-50}" width="26" height="4" fill="#fff" opacity=".85"/><rect x="${x-13}" y="${y-40}" width="26" height="3" fill="#fff" opacity=".85"/><circle cx="${x}" cy="${y-73}" r="9" fill="var(--skin)"/><path d="M${x-12} ${y-75}a12 12 0 0 1 24 0z" fill="var(--helmet)"/><rect x="${x-14}" y="${y-76}" width="28" height="3" rx="1.5" fill="var(--helmet)"/><rect x="${x+11}" y="${y-58}" width="13" height="17" rx="1.5" fill="#fff" stroke="var(--ink)"/><line x1="${x+14}" y1="${y-53}" x2="${x+21}" y2="${y-53}" stroke="var(--ink)"/><line x1="${x+14}" y1="${y-48}" x2="${x+21}" y2="${y-48}" stroke="var(--ink)"/></g>`;
+const pill=(x,y,t,c="var(--k1)",a="",fs0=13)=>{const fs=Math.round(fs0*1.3),w=Math.round(t.length*fs*.56+20);x=Math.max(4,Math.min(x,636-w));return `<g${at(a)}><rect x="${x}" y="${y-fs}" width="${w}" height="${fs*2}" rx="${fs}" fill="${c}"/><text x="${x+w/2}" y="${y+fs*.36}" text-anchor="middle" font-size="${fs}" font-weight="700" fill="#fff">${t}</text></g>`};
+const tick=(x,y,a="",r=13)=>`<g${at(a)}><circle cx="${x}" cy="${y}" r="${r}" fill="var(--good)"/><path d="M${x-r*.45} ${y}l${r*.32} ${r*.34}l${r*.6} -${r*.68}" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>`;
+const cross=(x,y,a="",r=13)=>`<g${at(a)}><circle cx="${x}" cy="${y}" r="${r}" fill="var(--bad)"/><path d="M${x-r*.4} ${y-r*.4}l${r*.8} ${r*.8}M${x+r*.4} ${y-r*.4}l-${r*.8} ${r*.8}" stroke="#fff" stroke-width="3" stroke-linecap="round"/></g>`;
+const T=(x,y,t,a="",fs=13,w=600,fill="var(--ink)",anchor="start")=>`<text x="${x}" y="${y}" font-size="${Math.round(fs*1.2)}" font-weight="${w}" fill="${fill}" text-anchor="${anchor}"${at(a)}>${t}</text>`;
+const doc=(x,y,t,c="var(--k0)",a="")=>`<g${at(a)}><rect x="${x}" y="${y}" width="62" height="78" rx="4" fill="#fff" stroke="${c}" stroke-width="2"/><rect x="${x}" y="${y}" width="62" height="18" rx="4" fill="${c}"/><text x="${x+31}" y="${y+13}" font-size="10" font-weight="700" fill="#fff" text-anchor="middle">${t}</text>${[30,40,50,60].map(d=>`<line x1="${x+8}" y1="${y+d}" x2="${x+54-(d%20)}" y2="${y+d}" stroke="#9aa6b2" stroke-width="2"/>`).join("")}</g>`;
+const ground=(y=262)=>`<rect x="0" y="${y}" width="${W_}" height="${H_-y}" fill="var(--soil)"/><line x1="0" y1="${y}" x2="${W_}" y2="${y}" stroke="var(--soilD)" stroke-width="2"/>`;
+const gauge=(x,y,r,na,label="",showBand=true)=>{const pt=(f,rr)=>{const a=Math.PI*(1-f);return [x+rr*Math.cos(a),y-rr*Math.sin(a)]};const arc=(f0,f1,rr)=>{const [a0,b0]=pt(f0,rr),[a1,b1]=pt(f1,rr);return `M${a0.toFixed(1)} ${b0.toFixed(1)}A${rr} ${rr} 0 0 1 ${a1.toFixed(1)} ${b1.toFixed(1)}`};
+ return `<g><circle cx="${x}" cy="${y}" r="${r+6}" fill="var(--card)" stroke="var(--ink)" stroke-width="2"/><path d="${arc(0,1,r-4)}" fill="none" stroke="#d5dbe0" stroke-width="7"/>${showBand?`<path d="${arc(.3,.8,r-4)}" fill="none" stroke="var(--good)" stroke-width="7"/>`:""}<line x1="${x}" y1="${y}" x2="${x}" y2="${y-r+10}" stroke="var(--k7)" stroke-width="3" stroke-linecap="round" style="transform-box:view-box;transform-origin:${x}px ${y}px"${at(na)}/><circle cx="${x}" cy="${y}" r="4" fill="var(--ink)"/>${label?`<text x="${x}" y="${y+r*.55}" font-size="11" font-weight="700" fill="var(--ink)" text-anchor="middle">${label}</text>`:""}</g>`};
+const arrow=(x1,y1,x2,y2,c="var(--ink)",a="",w=2.5)=>`<g${at(a)}><line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${c}" stroke-width="${w}" marker-end="url(#mArr)" style="color:${c}"/></g>`;
+const flowline=(d,c="var(--water)",a="",w=6)=>`<path d="${d}" fill="none" stroke="${c}" stroke-width="${w}" stroke-linecap="round" class="flow"${at(a)}/>`;
+const bolt=(x,y,a="")=>`<g${at(a)}><rect x="${x-4}" y="${y-22}" width="8" height="44" fill="#8a96a3"/><rect x="${x-8}" y="${y-30}" width="16" height="9" rx="1" fill="#5c6670"/><rect x="${x-8}" y="${y+21}" width="16" height="9" rx="1" fill="#5c6670"/></g>`;
+const DEFS=`<defs>
+<linearGradient id="gSteel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--steelL)"/><stop offset=".55" stop-color="var(--steelM)"/><stop offset="1" stop-color="var(--steelD)"/></linearGradient>
+<linearGradient id="gSteelV" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="var(--steelL)"/><stop offset=".55" stop-color="var(--steelM)"/><stop offset="1" stop-color="var(--steelD)"/></linearGradient>
+<marker id="mArr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="context-stroke"/></marker>
+</defs>`;
 
-const $ = (q,el=document)=>el.querySelector(q);
-const esc = t=>String(t).replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));
+/* every scene: [svg body, [captions for steps 1..n]] */
+const SCENES={
+/* ---- 0 Foundation ---- */
+f0:()=>[`${ground(272)}
+${[["ASME B31.3","base code: minimum rules","var(--k0)"],["SAES / SAMSS","Aramco adds stricter rules","var(--k1)"],["SAEP","how to do it","var(--k3)"],["SATIP → ITP","H / W / R points","var(--k4)"],["SAIC","the checklist","var(--k6)"],["SATR","the signed record","var(--k7)"]].map(([a,b,c],i)=>{const w=500-i*46,x=20+(500-w)/2,y=232-i*38;return `<g data-s="${i<2?i+1:i<4?i:i-1}" data-init="translate(0px,-60px)" data-m="${i<2?i+1:i<4?i:i-1}:translate(0px,0px)"><rect x="${x}" y="${y}" width="${w}" height="34" rx="6" fill="${c}"/><text x="${x+12}" y="${y+22}" font-size="14" font-weight="700" fill="#fff">${a}</text><text x="${x+w-10}" y="${y+22}" font-size="11.5" fill="#fff" text-anchor="end" opacity=".9">${b}</text></g>`}).join("")}
+${man(590,272,'data-s="4"')}
+${pill(470,40,"Stricter rule wins","var(--k1)",'data-s="2"')}
+${tick(600,170,'data-s="5" class="pulse"')}`,
+["ASME B31.3 is the base code for process piping.","SAES adds Aramco requirements on top. Where they differ, the stricter Aramco rule wins.","SAEP tells you how to do the work. The SATIP becomes your project ITP.","On site you inspect with the SAIC checklist.","You record the result on the SATR and sign it."]],
 
-/* ---------- figures ---------- */
-const FIG = {
-pyramid:()=>`<svg viewBox="0 0 760 250" role="img" aria-label="Document hierarchy from ASME B31.3 up to the SATR record">
-<text x="20" y="22" class="t-ink" font-size="15" font-weight="600">Each layer adds to the one below it</text>
-${[["ASME B31.3","the base code: minimum rules",0],["SAES / SAMSS","Aramco requirements and material specs",1],["SAEP","how to do it (e.g. SAEP-351 bolting)",2],["SATIP → project ITP","where the H / W / R points are",3],["SAIC","the checklist you fill in",4],["SATR","the signed test record",5]].map(([a,b,i])=>{const w=700-i*80,x=(760-w)/2,y=210-i*32;return `<g class="fadein" style="animation-delay:${i*.4}s"><rect x="${x}" y="${y}" width="${w}" height="28" rx="4" class="${i===0?'f-steel s-steel':'f-card s-line'}" stroke-width="1.2"/><text x="${x+12}" y="${y+19}" class="t-ink" font-size="13" font-weight="600">${a}</text><text x="${x+w-12}" y="${y+19}" class="t-mut" font-size="12" text-anchor="end">${b}</text></g>`}).join("")}
-</svg>`,
-receive:()=>{const st=["Documents","Visual","Marking","MTC","PMI"];return `<svg viewBox="0 0 760 200" role="img" aria-label="Receiving flow: documents, visual, marking, MTC, PMI, then accept or quarantine">
-<defs><marker id="ar1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--muted)"/></marker></defs>
-<text x="20" y="22" class="t-ink" font-size="15" font-weight="600">Five checks in order, then one of two outcomes</text>
-${st.map((t,i)=>{const x=20+i*124;return `<g><rect x="${x}" y="44" width="108" height="48" rx="8" class="f-card s-line" stroke-width="1.2"/><rect class="flowdot" style="animation-delay:${i}s" x="${x}" y="44" width="108" height="48" rx="8" fill="none" stroke="var(--tag)" stroke-width="2.5"/><text x="${x+54}" y="64" class="t-tag t-mono" font-size="13" font-weight="600" text-anchor="middle">${"DVMMP"[i]}</text><text x="${x+54}" y="82" class="t-ink" font-size="13" text-anchor="middle">${t}</text>${i<4?`<line x1="${x+108}" y1="68" x2="${x+124}" y2="68" class="s-line" stroke-width="1.2" marker-end="url(#ar1)"/>`:""}</g>`}).join("")}
-<path d="M630 68H660V48H676" fill="none" class="s-line" stroke-width="1.2" marker-end="url(#ar1)"/><path d="M660 68V140H676" fill="none" class="s-line" stroke-width="1.2" marker-end="url(#ar1)"/>
-<rect x="676" y="28" width="70" height="40" rx="8" class="f-good s-good" stroke-width="1.5"/><text x="711" y="46" class="t-ink" font-size="12" font-weight="600" text-anchor="middle">Accept</text><text x="711" y="60" class="t-mut" font-size="10.5" text-anchor="middle">tag, log heat</text>
-<rect x="676" y="120" width="70" height="40" rx="8" class="f-bad s-bad" stroke-width="1.5"/><text x="711" y="138" class="t-ink" font-size="12" font-weight="600" text-anchor="middle">Hold</text><text x="711" y="152" class="t-mut" font-size="10.5" text-anchor="middle">quarantine, NCR</text>
-<text x="20" y="128" class="t-mut" font-size="12">Mnemonic: "Do Very Many Material Plans"</text>
-<text x="20" y="148" class="t-mut" font-size="12">PMI applies to alloy items (API RP 578).</text>
-</svg>`},
-matrix:()=>{const rows=[["Pipe","A106 B","A333 Gr 6","A312 304L/316L"],["Fittings","A234 WPB","A420 WPL6","A403 WP316L"],["Flanges","A105N","A350 LF2","A182 F316L"],["Valve castings","A216 WCB","A352 LCB","A351 CF8M"],["Studs / nuts","B7 / 2H","L7M / 7M","B8 / 8"]];return `<div class="tbl"><table><tr><th>Part</th><th>Carbon steel</th><th>Low-temp</th><th>Stainless</th></tr>${rows.map(r=>`<tr><td>${r[0]}</td>${r.slice(1).map(c=>`<td class="mono">${c}</td>`).join("")}</tr>`).join("")}</table></div><p class="cap">Read down a column and say the family. Low-temp grades carry an L (WPL6, LF2, LCB, L7M), forgings an F, castings a C.</p>`},
-flange:()=>`<svg viewBox="0 0 760 230" role="img" aria-label="Flange bolt-hole rotation 2.4 mm and face tilt 1.6 mm">
-<text x="20" y="22" class="t-ink" font-size="15" font-weight="600">Two flange checks: rotation of the bolt holes and tilt of the face</text>
-<g transform="translate(190 125)">
-<circle r="78" class="f-card s-ink" stroke-width="1.5"/><circle r="30" class="f-steel s-line" stroke-width="1"/>
-<line x1="-95" y1="0" x2="95" y2="0" class="s-grid" stroke-dasharray="4 4"/><line x1="0" y1="-95" x2="0" y2="95" class="s-grid" stroke-dasharray="4 4"/>
-<g><animateTransform attributeName="transform" type="rotate" values="0;9;0" dur="5s" repeatCount="indefinite"/>
-${[22.5,67.5,112.5,157.5,202.5,247.5,292.5,337.5].map(a=>{const r=56,x=r*Math.cos(a*Math.PI/180),y=r*Math.sin(a*Math.PI/180);return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="7" class="f-tag s-tag" stroke-width="1.5"/>`}).join("")}</g>
-<text x="0" y="104" class="t-ink" font-size="13" font-weight="600" text-anchor="middle">Rotation ± 2.4 mm</text>
-</g>
-<text x="190" y="215" class="t-mut" font-size="12" text-anchor="middle">Holes straddle both centrelines</text>
-<g transform="translate(500 50)">
-<rect x="0" y="40" width="160" height="70" class="f-steel" />
-<rect x="160" y="0" width="16" height="150" class="f-card s-ink" stroke-width="1.5"/>
-<g><animateTransform attributeName="transform" type="rotate" values="0 196 75;-4 196 75;0 196 75" dur="5s" repeatCount="indefinite"/><rect x="188" y="0" width="16" height="150" class="f-tag s-tag" stroke-width="1.5"/></g>
-<line x1="176" y1="-6" x2="188" y2="-6" class="s-ink" stroke-width="1"/>
-<text x="182" y="-12" class="t-ink" font-size="12" text-anchor="middle">gap</text>
-<text x="90" y="175" class="t-ink" font-size="13" font-weight="600" text-anchor="middle">Face tilt ≤ 1.6 mm at the edge</text>
-</g>
-</svg>`,
-spring:()=>`<svg viewBox="0 0 760 210" role="img" aria-label="Spring support travel stops: locked from installation through the test, removed after">
-<text x="20" y="22" class="t-ink" font-size="15" font-weight="600">Spring stops stay locked until the test water is out</text>
-${[["Factory","cold set, stops fitted","in"],["Install","tag = data sheet","in"],["Hydrotest","stops IN, carry water","in"],["After test","stops OUT, record","out"]].map(([a,b,s],i)=>{const x=20+i*185;return `<g><rect x="${x}" y="46" width="165" height="70" rx="8" class="${s==='in'?'f-bad s-bad':'f-good s-good'}" stroke-width="1.5"/><text x="${x+14}" y="72" class="t-ink" font-size="14" font-weight="600">${a}</text><text x="${x+14}" y="94" class="t-mut" font-size="12">${b}</text>${i<3?`<path d="M${x+165} 81h18" class="s-line" stroke-width="1.2"/>`:""}</g>`}).join("")}
-<text x="20" y="150" class="t-ink" font-size="13">Red painted stop, tag: "Remove after hydrotest" (SAES-L-310 §13.4.4)</text>
-<text x="20" y="172" class="t-mut" font-size="12">Remove too early and the spring is overloaded by the water weight.</text>
-</svg>`,
-star:()=>`<svg viewBox="0 0 760 250" role="img" aria-label="Star tightening order for 8 bolts with four passes" id="starsvg">
-<text x="20" y="22" class="t-ink" font-size="15" font-weight="600">Opposite pairs, four passes</text>
-<g transform="translate(190 135)"><circle r="92" class="f-card s-ink" stroke-width="1.5"/><circle r="40" class="f-steel s-line"/>
-${[1,2,3,4,5,6,7,8].map(n=>{const a=(-90+(n-1)*45)*Math.PI/180,x=70*Math.cos(a),y=70*Math.sin(a);return `<g><circle data-b="${n}" class="bolt f-card s-line" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="14" stroke-width="1.5"/><text x="${x.toFixed(1)}" y="${(y+4.5).toFixed(1)}" class="t-ink t-mono" font-size="13" text-anchor="middle">${n}</text></g>`}).join("")}
-</g>
-<text x="400" y="64" class="t-mut" font-size="12">ORDER</text>
-<text x="400" y="88" class="t-ink t-mono" font-size="20" id="starorder">1 5 3 7 2 6 4 8</text>
-<text x="400" y="128" class="t-mut" font-size="12">PASS</text>
-${[33,66,100,100].map((p,i)=>`<g><rect x="${400+i*82}" y="138" width="72" height="60" rx="6" class="f-card s-line" stroke-width="1.2" data-pass="${i}"/><rect x="${400+i*82}" y="${138+60-60*p/100}" width="72" height="${60*p/100}" rx="6" class="f-tag" opacity=".7"/><text x="${436+i*82}" y="174" class="t-ink t-mono" font-size="15" text-anchor="middle">${p}%</text></g>`).join("")}
-<text x="400" y="222" class="t-mut" font-size="12" id="starpass">Watch the sequence run</text>
-</svg>`,
-gaugefig:()=>`<svg viewBox="0 0 760 200" role="img" aria-label="Gauge range rule: test pressure between 30 and 80 percent of full scale">
-<text x="20" y="22" class="t-ink" font-size="15" font-weight="600">TP must sit between 30% and 80% of the gauge's full scale</text>
-<line x1="60" y1="110" x2="700" y2="110" class="s-line" stroke-width="2"/>
-<rect x="252" y="96" width="320" height="28" class="f-good s-good" stroke-width="1.2"/>
-${[0,10,20,30,40,50,60,70,80,90,100].map(p=>`<line x1="${60+p*6.4}" y1="104" x2="${60+p*6.4}" y2="116" class="s-line"/><text x="${60+p*6.4}" y="140" class="t-mut t-mono" font-size="11" text-anchor="middle">${p}%</text>`).join("")}
-<text x="412" y="88" class="t-ink" font-size="12" font-weight="600" text-anchor="middle">acceptable band</text>
-<text x="60" y="176" class="t-ink" font-size="13">Example, TP 1125 psig: 0–1000 = 112% (no), 0–1500 = 75% (yes), 0–3000 = 37.5% (yes), 0–5000 = 22.5% (no)</text>
-</svg>`,
-profile:()=>`<svg viewBox="0 0 760 270" role="img" aria-label="Hydrotest pressure over time: fill, preliminary check, steps, stand-off, hold, inspection, drain">
-<text x="20" y="22" class="t-ink" font-size="15" font-weight="600">Hydrotest pressure over time (not to scale)</text>
-<line x1="60" y1="230" x2="740" y2="230" class="s-grid"/><line x1="60" y1="50" x2="60" y2="230" class="s-grid"/>
-<line x1="60" y1="70" x2="740" y2="70" class="s-grid" stroke-dasharray="3 4"/><text x="56" y="74" class="t-mut t-mono" font-size="11" text-anchor="end">TP</text>
-<line x1="60" y1="118" x2="740" y2="118" class="s-grid" stroke-dasharray="3 4"/><text x="56" y="122" class="t-mut t-mono" font-size="11" text-anchor="end">DP</text>
-<line x1="60" y1="190" x2="740" y2="190" class="s-grid" stroke-dasharray="3 4"/><text x="56" y="194" class="t-mut t-mono" font-size="11" text-anchor="end">½TP</text>
-<path class="drawn" style="--len:1300" d="M60 230 L120 230 L170 190 L215 190 L245 150 L270 150 L300 110 L320 110 L345 70 L520 70 L540 118 L640 118 L680 230 L740 230" fill="none" stroke="var(--steel)" stroke-width="3" stroke-linejoin="round"/>
-<rect x="345" y="58" width="70" height="8" class="f-bad"/><rect x="415" y="58" width="105" height="8" class="f-good"/>
-<g font-size="11.5">
-<text x="90" y="250" class="t-ink" text-anchor="middle">Fill, vents open</text>
-<text x="192" y="182" class="t-ink" text-anchor="middle">Prelim check</text>
-<text x="192" y="250" class="t-mut" text-anchor="middle">lesser of ½TP / 170 kPa</text>
-<text x="290" y="100" class="t-ink" text-anchor="middle">Steps</text>
-<text x="380" y="50" class="t-ink" text-anchor="middle">10 min away</text>
-<text x="468" y="50" class="t-ink" text-anchor="middle">≥ 30 min hold</text>
-<text x="590" y="110" class="t-ink" text-anchor="middle">Inspect at DP</text>
-<text x="700" y="250" class="t-ink" text-anchor="middle">Vents, drain</text>
-</g></svg>`,
-layup:()=>`<svg viewBox="0 0 760 230" role="img" aria-label="Lay-up decision: if start-up is within 30 days drain and dry, otherwise choose wet, dry, inert gas or ambient">
-<defs><marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--muted)"/></marker></defs>
-<text x="20" y="22" class="t-ink" font-size="15" font-weight="600">One question decides whether you need lay-up</text>
-<rect x="20" y="44" width="250" height="56" rx="8" class="f-tag s-tag" stroke-width="1.5"/>
-<text x="36" y="68" class="t-ink" font-size="14" font-weight="600">Start-up within 30 days</text><text x="36" y="88" class="t-mut" font-size="12">of first fill? (14 for HX and SS)</text>
-<path d="M270 62H330" class="s-line" stroke-width="1.2" marker-end="url(#ar2)"/><text x="300" y="54" class="t-mut" font-size="12" text-anchor="middle">yes</text>
-<rect x="330" y="44" width="200" height="40" rx="8" class="f-good s-good" stroke-width="1.2"/><text x="346" y="69" class="t-ink" font-size="13">Drain and dry, no lay-up</text>
-<path d="M145 100V140" class="s-line" stroke-width="1.2" marker-end="url(#ar2)"/><text x="155" y="124" class="t-mut" font-size="12">no</text>
-${[["Wet","≥ 20 ppm, ≤ 20 ppb"],["Dry","dew pt ≤ −1 °C"],["Inert gas","N₂, no air"],["Ambient","non-critical, approved"]].map(([a,b],i)=>`<g><rect x="${20+i*182}" y="140" width="168" height="56" rx="8" class="f-card s-line" stroke-width="1.2"/><text x="${34+i*182}" y="164" class="t-ink" font-size="14" font-weight="600">${a}</text><text x="${34+i*182}" y="184" class="t-mut t-mono" font-size="11.5">${b}</text></g>`).join("")}
-<text x="20" y="220" class="t-mut" font-size="12">Wet, dry and inert gas are held at 30–50 psig.</text>
-</svg>`,
-punch:()=>`<svg viewBox="0 0 760 170" role="img" aria-label="Punch A closes before the pressure test, punch B before handover">
-<text x="20" y="22" class="t-ink" font-size="15" font-weight="600">Two deadlines on one line</text>
-<line x1="40" y1="90" x2="730" y2="90" class="s-line" stroke-width="2"/>
-<rect x="40" y="56" width="250" height="26" rx="4" class="f-bad s-bad"/><text x="52" y="74" class="t-ink" font-size="13" font-weight="600">Punch A: welding status, supports, torque</text>
-<rect x="330" y="56" width="400" height="26" rx="4" class="f-steel s-steel"/><text x="342" y="74" class="t-ink" font-size="13" font-weight="600">Punch B: gaskets, blinds, instruments, paint, insulation</text>
-<path d="M310 98l8 8l-8 8l-8-8z" fill="var(--tag)"/><text x="310" y="134" class="t-ink" font-size="13" font-weight="600" text-anchor="middle">Pressure test</text>
-<path d="M730 98l8 8l-8 8l-8-8z" fill="var(--tag)"/><text x="730" y="134" class="t-ink" font-size="13" font-weight="600" text-anchor="end">MC / handover</text>
-<text x="20" y="160" class="t-mut" font-size="12">GI-0002.710 calls them YES items (close before MCC) and NO items (may stay open, no effect on safe start-up).</text>
-</svg>`,
-fourb:()=>`<svg viewBox="0 0 760 150" role="img" aria-label="Reinstatement: blinds, bolts, bits, back">
-<text x="20" y="22" class="t-ink" font-size="15" font-weight="600">Four words cover the whole reinstatement list</text>
-${[["Blinds","test blinds out, list signed"],["Bolts","new gasket, SAEP-351 record"],["Bits","CVs, PSVs, discs, instruments in"],["Back","valves, springs to operating"]].map(([a,b],i)=>`<g class="fadein" style="animation-delay:${i*.6}s"><rect x="${20+i*182}" y="44" width="168" height="80" rx="8" class="f-tag s-tag" stroke-width="1.5"/><text x="${34+i*182}" y="78" class="t-ink" font-size="22" font-weight="700" font-family="Barlow Condensed, Arial Narrow, sans-serif">${a}</text><text x="${34+i*182}" y="104" class="t-mut" font-size="11.5">${b}</text></g>`).join("")}
-</svg>`
+f1:()=>[`${ground(240)}<line x1="20" y1="214" x2="620" y2="214" stroke="var(--line)" stroke-width="4" stroke-dasharray="10 8"/>
+<g data-init="translate(0px,0px)" data-m="2:translate(150px,0px)|3:translate(290px,0px)|5:translate(450px,0px)">${pipe(30,200,110,24)}${flange(140,200,40)}</g>
+<g><rect x="208" y="120" width="44" height="30" rx="6" fill="var(--k4)"/><text x="230" y="141" font-size="16" font-weight="800" fill="#fff" text-anchor="middle">W</text><line x1="230" y1="150" x2="230" y2="240" stroke="var(--ink)" stroke-width="3"/></g>
+<g><rect x="370" y="120" width="44" height="30" rx="6" fill="var(--k7)"/><text x="392" y="141" font-size="16" font-weight="800" fill="#fff" text-anchor="middle">H</text><rect x="386" y="150" width="12" height="90" fill="var(--ink)"/>
+<g data-init="rotate(0deg)" data-m="4:rotate(-80deg)" style="transform-box:view-box;transform-origin:392px 176px"><rect x="392" y="170" width="120" height="12" rx="3" fill="var(--k7)"/><rect x="420" y="170" width="18" height="12" fill="#fff"/><rect x="460" y="170" width="18" height="12" fill="#fff"/></g></g>
+<g><rect x="548" y="120" width="44" height="30" rx="6" fill="var(--k0)"/><text x="570" y="141" font-size="16" font-weight="800" fill="#fff" text-anchor="middle">R</text></g>
+${man(260,240,'data-s="2" data-e="3"')}${T(178,96,"Notified. Work can go on.","data-s='2' data-e='3'",12,600,"var(--k4)")}
+${man(440,240,'data-s="3"')}${pill(330,92,"STOP",'var(--k7)','data-s="3" data-e="4" class="blink"')}${tick(470,96,'data-s="4"')}${T(490,101,"Released","data-s='4' data-e='5'",13,700,"var(--good)")}
+${doc(560,40,"ITP","var(--k0)",'data-s="5" class="bob"')}`,
+["Work moves along the ITP from point to point.","W (witness): the inspector is notified in advance. If they don't come, work may go on.","H (hold): work stops at the barrier. It cannot pass on its own.","Only the named authority signs and releases the hold point.","R (review): documents are approved before the work starts."]],
+
+f2:()=>[`${doc(30,40,"LINE LIST","var(--k0)",'data-s="1"')}
+${pipe(130,150,480,40)}
+<rect x="134" y="135" width="472" height="30" rx="3" fill="var(--water)" opacity=".75" data-s="2" data-e="3"/>
+<rect x="134" y="135" width="472" height="30" rx="3" fill="var(--k7)" opacity=".7" data-s="3" data-e="4"/>
+<rect x="134" y="135" width="472" height="30" rx="3" fill="var(--k2)" opacity=".7" data-s="4"/>
+${flowline("M140 150H600","#fff","",3)}
+<g data-s="2" data-e="3">${pill(160,222,"Category D",'var(--water)')}${T(290,227,"non-flammable, non-toxic, ≤ 150 psig, −29 to 186 °C","",13,600)}</g>
+<g data-s="3" data-e="4">${pill(160,222,"Category M",'var(--k7)')}<path d="M300 205l14 26h-28z" fill="var(--k8)" stroke="var(--ink)"/>${T(300,228,"!","",14,800,"var(--ink)","middle")}${T(326,227,"toxic: a tiny leak is serious, sensitive leak test","",13,600)}</g>
+<g data-s="4">${pill(160,222,"Normal",'var(--k2)')}${T(260,227,"the default. Slip-on flanges only in Category D","",13,600)}</g>
+${T(110,60,"The category sets the components allowed and the test.","data-s='1'",13,600,"var(--muted)")}`,
+["Find the fluid service category on the line list.","Category D: non-flammable, non-toxic, up to 150 psig, −29 to 186 °C.","Category M: toxic. Even a tiny leak can harm people, so the leak test is more sensitive.","Normal fluid service covers everything else. Slip-on flanges are allowed only in Category D."]],
+
+f3:()=>[`${doc(40,60,"P&ID","var(--k0)",'data-s="1" data-init="translate(-80px,0px)" data-m="1:translate(0px,0px)"')}${doc(130,60,"LINE LIST","var(--k1)",'data-s="1" data-init="translate(0px,-80px)" data-m="1:translate(0px,0px)"')}${doc(220,60,"ISO (IFC)","var(--k4)",'data-s="1" data-init="translate(80px,0px)" data-m="1:translate(0px,0px)"')}
+<g data-s="2" data-init="translate(0px,0px)" data-m="2:translate(200px,0px)" class="dur3"><circle cx="70" cy="190" r="22" fill="none" stroke="var(--ink)" stroke-width="5"/><line x1="86" y1="206" x2="104" y2="226" stroke="var(--ink)" stroke-width="7" stroke-linecap="round"/></g>
+${cross(250,52,'data-s="3"')}${T(270,57,"Size differs!","data-s='3'",13,700,"var(--bad)")}
+${pill(312,180,"STOP work",'var(--k7)','data-s="3"')}
+<g data-s="4" data-init="translate(0px,0px)" data-m="4:translate(160px,-40px)">${doc(400,150,"RFI","var(--k7)")}</g>
+<g data-s="4"><rect x="540" y="40" width="80" height="60" rx="6" fill="var(--k0)"/>${T(580,66,"ENGG","",13,800,"#fff","middle")}${T(580,84,"decides","",11,600,"#fff","middle")}</g>`,
+["Pull the P&ID, the line list and the latest IFC isometric.","Cross-check line number, size, class, supports and test limits.","If they disagree, stop the work.","Raise an RFI to engineering. Never decide in the field."]],
+
+/* ---- 1 Receiving ---- */
+r0:()=>[`${ground(250)}
+<g data-init="translate(-300px,0px)" data-m="1:translate(0px,0px)"><rect x="40" y="170" width="170" height="60" rx="4" fill="var(--k1)"/><rect x="210" y="190" width="50" height="40" rx="6" fill="var(--k1)"/><rect x="220" y="196" width="26" height="16" rx="2" fill="#cfe8ff"/><circle cx="80" cy="238" r="13" fill="var(--ink)"/><circle cx="230" cy="238" r="13" fill="var(--ink)"/>
+<g data-init="translate(0px,0px)" data-m="5:translate(300px,10px)">${pipe(50,160,150,22)}</g></g>
+${man(330,250,'data-s="2"')}
+${["D","V","M","M","P"].map((l,i)=>`<g data-s="${[2,2,3,3,4][i]}"><circle cx="${300+i*52}" cy="60" r="20" fill="var(--k${[0,1,3,4,6][i]})"/><text x="${300+i*52}" y="66" font-size="18" font-weight="800" fill="#fff" text-anchor="middle">${l}</text>${tick(300+i*52+15,44,"",8)}</g>`).join("")}
+${T(300,104,"Docs · Visual · Marking · MTC · PMI","data-s='2'",12,600,"var(--muted)")}
+<g data-s="5"><rect x="380" y="180" width="150" height="10" fill="var(--k2)"/><rect x="380" y="200" width="150" height="10" fill="var(--k2)"/>${pill(360,146,"Accept · log heat",'var(--good)')}</g>
+<g data-s="6"><rect x="560" y="150" width="70" height="90" rx="4" fill="none" stroke="var(--bad)" stroke-width="3" stroke-dasharray="8 5"/>${T(595,140,"QUARANTINE","",10,800,"var(--bad)","middle")}${pipe(566,215,58,16)}${pill(556,262,"NCR",'var(--bad)')}</g>`,
+["Material arrives with the PO, packing list and MTC.","D: check documents. V: visual check and dimensions.","M: the marking matches the MTC. M: the MTC matches the spec and line class.","P: PMI on every alloy item.","Pass: tag it, log the heat number and move it to the rack.","Fail: quarantine it, hang a hold tag and raise an NCR."]],
+
+r1:()=>[`${pipe(40,150,400,46)}
+<text x="70" y="156" font-size="15" font-weight="800" fill="var(--ink)" font-family="var(--mono)">A106 B · 6" SCH40 · HEAT 4A732</text>
+<g data-s="1">${doc(500,40,"MTC","var(--k1)")}${T(531,140,"HEAT 4A732","",11,800,"var(--k1)","middle")}</g>
+<path d="M330 140C400 100 460 120 500 110" fill="none" stroke="var(--good)" stroke-width="3" stroke-dasharray="6 5" data-s="1" class="flow"/>
+<g data-s="2">${pill(480,170,"Chemistry ✓",'var(--k0)')}${pill(480,204,"Mechanical ✓",'var(--k3)')}${pill(480,238,"Heat treatment ✓",'var(--k4)')}</g>
+<g data-s="3"><rect x="300" y="128" width="98" height="44" rx="4" fill="none" stroke="var(--k8)" stroke-width="3" stroke-dasharray="5 4"/><text x="349" y="200" font-size="13" font-weight="800" fill="var(--k8)" text-anchor="middle" font-family="var(--mono)">HEAT 4A732</text>${T(349,222,"transferred first","",12,600,"var(--muted)","middle")}</g>
+<g data-s="4" data-init="translate(0px,-70px)" data-m="4:translate(0px,0px)"><circle cx="290" cy="94" r="30" fill="#cfd6dc" stroke="var(--ink)" stroke-width="2" class="spin"/><circle cx="290" cy="94" r="6" fill="var(--ink)"/></g>
+<rect x="296" y="124" width="6" height="52" fill="var(--paper)" data-s="4"/>`,
+["The heat number on the pipe must match the heat number on the MTC.","On the MTC, check chemistry, mechanical results and heat treatment against the ASTM spec.","Before cutting, transfer the heat number onto the off-cut.","Then cut. Both pieces stay traceable to the MTC."]],
+
+r2:()=>[`${pipe(40,170,330,50)}${T(60,176,"316L","",15,800,"var(--ink)")}
+<g data-s="1" data-init="translate(120px,0px)" data-m="2:translate(0px,0px)"><rect x="390" y="120" width="120" height="44" rx="10" fill="var(--k6)"/><rect x="420" y="160" width="26" height="60" rx="6" fill="var(--k6)"/><rect x="440" y="128" width="60" height="28" rx="4" fill="#0c1b26"/><text x="470" y="147" font-size="11" font-weight="700" fill="#7fffd4" text-anchor="middle" font-family="var(--mono)" data-txt="1:READY|2:316L ✓|3:304L ✓|4:WRONG">READY</text></g>
+<path d="M388 142L372 162" stroke="var(--k8)" stroke-width="4" data-s="2" class="blink"/>
+${pill(400,250,"XRF: fast, no mark, no carbon",'var(--k6)','data-s="2" data-e="3"')}
+<g data-s="3"><circle cx="300" cy="150" r="9" fill="var(--k8)" class="pulse"/>${pill(380,250,"OES: reads carbon, leaves a burn",'var(--k7)','data-e="4"')}</g>
+<g data-s="4">${cross(200,90)}${pill(240,90,"Quarantine heat + NCR",'var(--bad)')}</g>`,
+["PMI every alloy item before it is accepted.","XRF gun: fast and leaves no mark, but it cannot read carbon.","OES spark: reads carbon, so it can tell 304 from 304L. It leaves a small burn mark.","Wrong alloy? Quarantine the whole heat and raise an NCR."]],
+
+r3:()=>[`${[["Carbon steel","var(--k2)",["A106 B","A234 WPB","A105N","A216 WCB","B7 / 2H"]],["Low temp (−45 °C)","var(--water)",["A333 Gr 6","A420 WPL6","A350 LF2","A352 LCB","L7M / 7M"]],["Stainless","var(--k6)",["A312 316L","A403 WP316L","A182 F316L","A351 CF8M","B8 / 8"]]].map(([h,c,it],i)=>`<g><rect x="${150+i*160}" y="20" width="150" height="32" rx="8" fill="${c}"/><text x="${225+i*160}" y="41" font-size="13" font-weight="800" fill="#fff" text-anchor="middle">${h}</text>${it.map((t,j)=>`<g data-s="${j+1}" data-init="translate(0px,-30px)" data-m="${j+1}:translate(0px,0px)"><rect x="${150+i*160}" y="${62+j*40}" width="150" height="32" rx="6" fill="#fff" stroke="${c}" stroke-width="2"/><text x="${225+i*160}" y="${83+j*40}" font-size="13" font-weight="700" fill="#13263A" text-anchor="middle" font-family="var(--mono)">${t}</text></g>`).join("")}</g>`).join("")}
+${["Pipe","Fittings","Flanges","Castings","Bolts"].map((t,j)=>T(20,83+j*40,t,`data-s="${j+1}"`,14,700)).join("")}
+${pill(150,282,"Low-temp grades carry an L: WPL6, LF2, LCB, L7M",'var(--k0)','data-s="6"',12)}`,
+["Pipe: A106 B, A333 Gr 6 for low temperature, A312 for stainless.","Fittings: A234 WPB, A420 WPL6, A403.","Flanges: A105N (normalised), A350 LF2, A182 F316L.","Valve castings: A216 WCB, A352 LCB, A351 CF8M.","Bolting: B7/2H, L7M/7M, B8/8. Sour service: B7M/2HM, max 235 HB.","Memory trick: low-temperature grades carry an L."]],
+
+r4:()=>[`${[["½",8],["¾",10],["1",12],["1¼",14,1],["1½",16],["2",19],["2½",22,1],["3",26],["3½",29,1],["4",32],["5",37,1],["6",42]].map(([s,r,x],i)=>{const cx=26+i*48+(i>5?(i-5)*3:0);return `<g data-s="1"><circle cx="${cx}" cy="120" r="${r}" fill="url(#gSteel)" stroke="var(--steelD)"/><circle cx="${cx}" cy="120" r="${r*.75}" fill="var(--paper)"/>${T(cx,180,s+'"',"",13,700,"var(--ink)","middle")}${x?cross(cx,120,'data-s="2"',12):""}</g>`}).join("")}
+${pill(20,214,"Not used: 1¼, 2½, 3½, 5 in",'var(--bad)','data-s="2"')}
+<g data-s="3"><rect x="54" y="92" width="44" height="56" rx="8" fill="none" stroke="var(--k8)" stroke-width="3"/>${pill(20,250,"Hazardous: min ¾ in (vents and drains too)",'var(--k8)')}</g>
+${pill(20,284,"≤ 2 in hydrocarbon: min Sch 80",'var(--k0)','data-s="4"')}`,
+["The line class gives material, rating, facing, gasket, bolts and wall thickness.","Sizes 1¼, 2½, 3½ and 5 in are not used, except to match equipment.","In hazardous service the minimum size is ¾ in, including vents and drains.","Hydrocarbon lines of 2 in and smaller need at least Sch 80."]],
+
+r5:()=>[`${ground(250)}<rect x="150" y="200" width="300" height="50" fill="var(--k2)" opacity=".8"/>
+${flange(200,160,70)}${pipe(205,160,190,40)}${flange(400,160,70)}${valve(300,160,"","var(--k3)")}
+<rect x="210" y="146" width="180" height="28" fill="var(--water)" opacity=".7" data-s="2" data-init="scaleX(0)" data-m="2:scaleX(1)" style="transform-origin:left;transform-box:fill-box"/>
+${gauge(540,120,46,'data-init="rotate(-90deg)" data-m="2:rotate(10deg)|3:rotate(-25deg)|4:rotate(-25deg)"',"")}
+${T(540,190,"","data-txt='1:0|2:1.5 × rating|3:1.1 × rating|4:zero drops'",13,800,"var(--ink)","middle")}
+<g data-s="1">${pill(30,40,"Nameplate · rating · trim · flow arrow",'var(--k1)')}</g>
+${pill(30,80,"Shell test (API 598)",'var(--k4)','data-s="2" data-e="3"')}${pill(30,80,"Seat test",'var(--k6)','data-s="3" data-e="4"')}
+<g data-s="4">${pill(30,80,"Soft seat: zero leakage",'var(--good)')}${tick(470,240)}</g>`,
+["At receipt check the nameplate, rating, body and trim, flow arrow, ends and test certificate.","Shell test at 1.5 × the 38 °C rating (API 598).","High-pressure seat test at 1.1 × the rating.","Resilient (soft) seats must show zero leakage."]],
+
+/* ---- 2 Storage ---- */
+st0:()=>[`${ground(240)}
+<g data-init="translate(0px,26px)" data-m="2:translate(0px,0px)">${pipe(60,200,260,30)}${pipe(60,170,260,30)}</g>
+${cross(340,180,'data-s="1" data-e="2"')}${T(370,186,"On the ground: never","data-s='1' data-e='2'",14,700,"var(--bad)")}
+<g data-s="2"><rect x="80" y="216" width="22" height="24" fill="var(--k2)"/><rect x="270" y="216" width="22" height="24" fill="var(--k2)"/>${T(110,236,"sleepers","",12,700,"var(--k2)")}</g>
+<g data-s="3"><rect x="48" y="155" width="14" height="30" rx="3" fill="var(--k8)" data-init="translate(-40px,0px)" data-m="3:translate(0px,0px)"/><rect x="318" y="155" width="14" height="30" rx="3" fill="var(--k8)" data-init="translate(40px,0px)" data-m="3:translate(0px,0px)"/><rect x="48" y="185" width="14" height="30" rx="3" fill="var(--k8)" data-init="translate(-40px,0px)" data-m="3:translate(0px,0px)"/><rect x="318" y="185" width="14" height="30" rx="3" fill="var(--k8)" data-init="translate(40px,0px)" data-m="3:translate(0px,0px)"/>${T(150,140,"end caps on","",13,700,"var(--k8)")}</g>
+<g data-s="4"><line x1="400" y1="120" x2="400" y2="240" stroke="var(--k7)" stroke-width="4" stroke-dasharray="10 6"/><rect x="430" y="216" width="18" height="24" fill="var(--k2)"/><rect x="580" y="216" width="18" height="24" fill="var(--k2)"/>
+<g data-init="translate(0px,-70px)" data-m="4:translate(0px,0px)"><rect x="420" y="186" width="190" height="30" rx="3" fill="#d9e2e8" stroke="#8fa3b1"/>${T(515,206,"STAINLESS","",12,800,"#4b5d6b","middle")}<path d="M450 186V120M580 186V120" stroke="var(--k6)" stroke-width="5"/>${T(515,112,"nylon slings","",12,700,"var(--k6)","middle")}</g></g>`,
+["Pipe is never laid on the ground.","Store it on sleepers or sand mounds, stacked without damage.","End protectors stay firmly on. Sand inside a pipe ends up in a pump.","Stainless is kept apart from carbon steel, away from seawater, and lifted with nylon slings."]],
+
+/* ---- 3 Erection ---- */
+e0:()=>[`${pipe(40,170,250,36)}${flange(295,170,90)}
+<line x1="40" y1="230" x2="295" y2="230" stroke="var(--k3)" stroke-width="2" marker-end="url(#mArr)" marker-start="url(#mArr)" data-s="1"/>${pill(110,258,"± 3 mm",'var(--k3)','data-s="1"')}
+<g data-s="2">${vpipe(150,70,82,22)}<line x1="150" y1="60" x2="150" y2="40" stroke="var(--k4)" stroke-width="2"/>${pill(166,52,"branch ± 1.5 mm",'var(--k4)')}</g>
+<g transform="translate(470 150)" data-s="3"><circle r="78" fill="url(#gSteel)" stroke="var(--steelD)" stroke-width="2"/><circle r="30" fill="var(--paper)"/><line x1="-95" y1="0" x2="95" y2="0" stroke="var(--k7)" stroke-dasharray="5 4"/><line x1="0" y1="-95" x2="0" y2="95" stroke="var(--k7)" stroke-dasharray="5 4"/>
+<g class="wob">${[22.5,67.5,112.5,157.5,202.5,247.5,292.5,337.5].map(a=>`<circle cx="${(56*Math.cos(a*Math.PI/180)).toFixed(1)}" cy="${(56*Math.sin(a*Math.PI/180)).toFixed(1)}" r="8" fill="var(--paper)" stroke="var(--ink)" stroke-width="1.5"/>`).join("")}</g></g>
+${pill(400,268,"holes straddle · ± 2.4 mm",'var(--k7)','data-s="3"')}
+<g data-s="4" data-init="rotate(0deg)" data-m="4:rotate(-6deg)" style="transform-box:view-box;transform-origin:295px 215px">${flange(295,170,90)}</g>${pill(250,90,"tilt ≤ 1.6 mm",'var(--k8)','data-s="4"')}`,
+["Face-to-face, centre-to-face and location: ± 3 mm.","Branch offset from the run centreline: ± 1.5 mm.","Flange bolt holes straddle both centrelines. Rotation tolerance ± 2.4 mm.","Flange face tilt: no more than 1.6 mm at the outside edge."]],
+
+e1:()=>[`${pipe(30,190,580,40)}<rect x="296" y="168" width="8" height="44" fill="var(--k8)"/>${T(300,240,"girth weld","",12,700,"var(--k8)","middle")}
+<g data-s="1" data-init="translate(0px,0px)" data-m="2:translate(160px,0px)">${vpipe(300,90,80,26)}</g>
+${cross(340,110,'data-s="1" data-e="2"')}${tick(500,110,'data-s="2"')}
+<g data-s="3"><rect x="80" y="160" width="120" height="14" rx="3" fill="var(--k3)"/><circle cx="110" cy="167" r="3" fill="var(--ink)"/>${["","",""].map((_,i)=>`<circle cx="${110+i*4}" cy="${150-i*12}" r="${4+i}" fill="none" stroke="var(--water)" stroke-width="2" class="drip" style="animation-delay:${i*.4}s"/>`).join("")}${pill(60,128,"pad: tell-tale hole air-soap test",'var(--k3)','',11)}</g>
+${pill(330,270,"Attachments welded before PWHT",'var(--k7)','data-s="4"')}`,
+["Never put a branch or reinforcing pad over a girth weld.","Move it clear of the weld.","Reinforcing pad: same material as the pipe, and the tell-tale hole is air-soap tested.","On spools that get PWHT, weld every attachment before PWHT, and do PWHT before flange assembly."]],
+
+e2:()=>[`<rect x="80" y="20" width="200" height="14" fill="var(--ink)"/><line x1="180" y1="34" x2="180" y2="70" stroke="var(--ink)" stroke-width="4"/>
+<g data-init="translate(0px,0px)" data-m="4:translate(0px,-10px)"><rect x="150" y="70" width="60" height="80" rx="6" fill="var(--k4)"/><path d="M160 80l40 10l-40 10l40 10l-40 10l40 10l-40 10" fill="none" stroke="#fff" stroke-width="3" class="dur3"/><rect x="140" y="104" width="80" height="12" fill="var(--k7)" data-e="4"/>${T(180,114,"STOP","data-e='4'",9,800,"#fff","middle")}<line x1="180" y1="150" x2="180" y2="186" stroke="var(--ink)" stroke-width="4"/>${pipe(40,200,280,30)}
+<rect x="44" y="190" width="272" height="20" fill="var(--water)" opacity=".75" data-s="2" data-e="3"/></g>
+${pill(30,262,"Hydrotest: stops IN",'var(--k7)','data-s="2" data-e="3"')}${pill(30,262,"After test: stops OUT, record setting",'var(--good)','data-s="3"')}
+<g data-s="5">${pipe(380,130,240,30)}${vpipe(470,145,90,30)}<rect x="440" y="235" width="60" height="8" fill="var(--ink)"/><circle cx="470" cy="226" r="4" fill="var(--paper)" stroke="var(--ink)"/><circle cx="470" cy="236" r="3" fill="var(--water)" class="drip"/>${pill(380,276,"dummy support: 6 mm weep hole",'var(--k3)','',12)}</g>`,
+["Spring hangers arrive with red travel stops, tagged \"Remove after hydrotest\".","During the hydrotest the stops stay IN, so the spring doesn't carry the water weight.","After draining, the stops come OUT and the setting is recorded.","The spring now carries the pipe in its cold set position.","Dummy supports need a 6 mm weep hole so water can't collect inside."]],
+
+e3:()=>[`${ground(250)}<rect x="0" y="252" width="${W_}" height="48" fill="var(--soil)"/>
+${pipe(20,90,420,26)}${pipe(20,146,420,26)}
+<line x1="300" y1="104" x2="300" y2="132" stroke="var(--k4)" stroke-width="2" marker-end="url(#mArr)" marker-start="url(#mArr)" data-s="2"/>${pill(310,118,"≥ 120 mm",'var(--k4)','data-s="2"',11)}
+<g data-s="1">${vpipe(120,159,60,18)}${flange(120,222,0)}<rect x="111" y="200" width="18" height="18" fill="#5a4a2c" opacity=".7" class="pulse"/>${pill(140,236,"dead leg > 3D or 1.22 m (lesser)",'var(--k8)','',11)}</g>
+<line x1="400" y1="160" x2="400" y2="250" stroke="var(--k1)" stroke-width="2" marker-end="url(#mArr)" marker-start="url(#mArr)" data-s="3"/>${pill(410,200,"≥ 300 mm to grade",'var(--k1)','data-s="3"',11)}
+<g data-s="4"><rect x="460" y="252" width="180" height="10" fill="#555"/>${pipe(480,284,140,18)}<line x1="560" y1="262" x2="560" y2="274" stroke="#fff" stroke-width="2"/>${pill(470,232,"cover ≥ 450, roads ≥ 750 mm",'var(--k0)','',11)}</g>
+<g data-s="5"><rect x="520" y="40" width="90" height="70" rx="10" fill="var(--k3)"/>${T(565,80,"PUMP","",13,800,"#fff","middle")}<path d="M440 70L500 76L500 104L440 104Z" fill="url(#gSteel)" stroke="var(--steelD)"/>${T(470,64,"flat on top","",11,700,"var(--k3)","middle")}</g>`,
+["Dead leg: a branch longer than 3D or 1.22 m, whichever is less. Stagnant water corrodes it.","Pipe to structure or another pipe: at least 120 mm.","Lowest point of the pipe to grade: at least 300 mm.","Buried pipe: at least 450 mm cover, 750 mm under roads.","Pump suction: eccentric reducer, flat side on top, with 5D straight run."]],
+
+e4:()=>[`${pipe(20,150,600,30)}${flowline("M30 150H610","var(--water)","",4)}
+<g data-s="1">${arrow(60,110,160,110,"var(--k3)")}${T(60,98,"flow","",12,700,"var(--k3)")}</g>
+<g data-s="2"><rect x="230" y="128" width="60" height="44" rx="6" fill="var(--k4)"/>${T(260,155,"CHECK","",10,800,"#fff","middle")}<line x1="110" y1="190" x2="230" y2="190" stroke="var(--k4)" stroke-width="2" marker-end="url(#mArr)" marker-start="url(#mArr)"/>${T(170,208,"5D","",12,800,"var(--k4)","middle")}<line x1="290" y1="190" x2="340" y2="190" stroke="var(--k4)" stroke-width="2" marker-end="url(#mArr)" marker-start="url(#mArr)"/>${T(315,208,"2D","",12,800,"var(--k4)","middle")}</g>
+<g data-s="3">${vpipe(450,60,75,24)}<rect x="428" y="30" width="44" height="36" rx="6" fill="var(--k7)"/>${T(450,53,"PSV","",11,800,"#fff","middle")}${valve(450,108,"","var(--k3)")}<circle cx="476" cy="104" r="6" fill="none" stroke="var(--k8)" stroke-width="3"/>${pill(484,48,"car-sealed open",'var(--k7)','',11)}</g>
+<g data-s="4">${vpipe(560,165,40,14)}${valve(560,215,"","var(--k3)")}<rect x="552" y="236" width="16" height="10" fill="var(--k8)"/>${pill(380,262,"vent/drain: valve + plug or blind",'var(--k8)','',11)}</g>`,
+["Check the flow arrow on every valve matches the flow direction.","Check valves of 4 in and larger: 5D straight upstream, 2D downstream.","PSVs stand upright and their block valves are car-sealed open.","Every vent or drain to atmosphere has a valve plus a plug or blind."]],
+
+e5:()=>[`<rect x="380" y="90" width="200" height="130" rx="14" fill="var(--k3)"/>${T(480,160,"PUMP","",18,800,"#fff","middle")}<rect x="580" y="140" width="50" height="20" fill="var(--ink)"/>${flange(375,155,80)}
+<g data-init="translate(-60px,0px)" data-m="1:translate(0px,0px)">${pipe(120,155,236,40)}${flange(358,155,80)}</g>
+<g data-s="2">${pill(130,60,"gap = gasket ± 1.6 mm",'var(--k4)')}${pill(130,100,"bolt holes ± 2.4 mm",'var(--k7)')}</g>
+<g data-s="3"><rect x="590" y="90" width="40" height="40" rx="20" fill="var(--card)" stroke="var(--ink)" stroke-width="2"/><line x1="610" y1="110" x2="610" y2="94" stroke="var(--k7)" stroke-width="2" class="wob" style="transform-box:view-box;transform-origin:610px 110px"/><line x1="610" y1="130" x2="610" y2="140" stroke="var(--ink)" stroke-width="2"/>${T(610,80,"dial","",11,700,"var(--ink)","middle")}</g>
+${pill(380,250,"shaft movement ≤ 0.05 mm",'var(--good)','data-s="4"')}`,
+["Bring the pipe flange to the pump nozzle. Bolts must pass freely, never forced.","Face gap is the gasket thickness ± 1.6 mm. Bolt-hole offset ± 2.4 mm.","A dial indicator on the pump shaft watches for movement during bolt-up.","Movement must stay within 0.05 mm. Remove the studs: alignment must still hold."]],
+
+/* ---- 4 Bolting ---- */
+b0:()=>[`<g transform="translate(170 150)"><circle r="110" fill="var(--k8)" data-s="3" class="pulse"/><circle r="110" fill="url(#gSteel)" data-e="3"/><circle r="92" fill="#c9d1d8" data-s="3"/>${[...Array(28)].map((_,i)=>`<circle r="${88-i*1.4}" fill="none" stroke="${i%2?'#8b98a5':'#e7ecf0'}" stroke-width="1" data-s="3"/>`).join("")}<circle r="48" fill="var(--paper)"/>${T(0,5,"6 in","",14,800,"var(--ink)","middle")}</g>
+${pill(320,40,"Weld neck: first choice ≥ 2 in",'var(--k0)','data-s="1"')}
+${pill(320,84,"RF up to Class 600 · RTJ Class 900+",'var(--k4)','data-s="2"')}
+<g data-s="3">${pill(320,128,"Outer ring: always",'var(--k8)')}<rect x="330" y="160" width="26" height="16" rx="3" fill="#f2c94c"/>${T(362,173,"yellow = 304","",12,700)}<rect x="460" y="160" width="26" height="16" rx="3" fill="#41a85f"/>${T(492,173,"green = 316L","",12,700)}</g>
+<g data-s="4">${cross(340,226)}${T(362,231,"RF to FF: never","",13,700,"var(--bad)")}${pill(330,268,"Opened joint = new gasket",'var(--k7)')}</g>`,
+["Weld neck flanges are the first choice from 2 in up.","Raised face up to Class 600. Ring-type joint for Class 900 and above.","Spiral-wound gaskets always have an outer ring. Yellow means 304, green means 316L.","Never mix raised face with flat face. A joint that was opened always gets a new gasket."]],
+
+b1:()=>[`${[["Approved bolt-up procedure","var(--k0)"],["Certified bolter, ID checked","var(--k1)"],["Tool calibrated ± 5%","var(--k4)"],["Nuts run free by hand","var(--k3)"],["Lube threads + nut face only","var(--k8)"],["Aligned, never forced","var(--k7)"]].map(([t,c],i)=>`<g data-s="${i+1}" data-init="translate(-40px,0px)" data-m="${i+1}:translate(0px,0px)"><rect x="40" y="${20+i*44}" width="330" height="36" rx="8" fill="${c}"/>${T(56,43+i*44,t,"",14,700,"#fff")}${tick(390,38+i*44)}</g>`).join("")}
+${man(520,270,'data-s="1"')}
+<g data-s="6">${T(470,90,"parallel ≤ 0.8 mm","",12,700,"var(--k7)")}${T(470,110,"offset ≤ 1.5 mm","",12,700,"var(--k7)")}${T(470,130,"rotation ≤ 3 mm","",12,700,"var(--k7)")}</g>`,
+["An approved bolt-up procedure is at the joint.","The bolter is certified (ECITB, API or C&G) and you check their ID.","Torque tools are calibrated within ± 5%.","Nuts run freely by hand. Re-assembly gets new bolts and nuts.","Lubricant goes on the threads and nut face, never on the gasket.","Flanges are aligned before tightening: parallel ≤ 0.8 mm, offset ≤ 1.5 mm, rotation ≤ 3 mm."]],
+
+b2:()=>[`<g transform="translate(170 150)"><circle r="112" fill="url(#gSteel)" stroke="var(--steelD)" stroke-width="2"/><circle r="50" fill="var(--paper)"/>
+${[1,2,3,4,5,6,7,8].map(n=>{const a=(-90+(n-1)*45)*Math.PI/180,x=82*Math.cos(a),y=82*Math.sin(a),ord=[1,5,3,7,2,6,4,8].indexOf(n);return `<g><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="15" fill="#5c6670" class="boltseq" style="animation-delay:${ord*0.45}s"/><text x="${x.toFixed(1)}" y="${(y+5).toFixed(1)}" font-size="14" font-weight="800" fill="#fff" text-anchor="middle">${n}</text></g>`}).join("")}</g>
+${T(330,50,"Order: 1 5 3 7 2 6 4 8","",16,800,"var(--ink)")}
+${[33,66,100,100].map((p,i)=>`<g data-s="${i+1}"><rect x="${330+i*72}" y="80" width="60" height="110" rx="6" fill="var(--card)" stroke="var(--line)" stroke-width="2"/><rect x="${330+i*72}" y="${190-110*p/100}" width="60" height="${110*p/100}" rx="6" fill="var(--k4)" data-init="scaleY(0)" data-m="${i+1}:scaleY(1)" style="transform-origin:bottom;transform-box:fill-box"/><text x="${360+i*72}" y="210" font-size="14" font-weight="800" fill="var(--ink)" text-anchor="middle">${p}%</text></g>`).join("")}
+${pill(330,256,"≥ 1 in bolts: hydraulic tool only",'var(--k7)','data-s="5"',12)}`,
+["Pass 1: tighten to 33% in the star order 1-5-3-7-2-6-4-8.","Pass 2: 66%, same star order.","Pass 3: 100%.","Pass 4: 100% again as a check pass. Nothing should move.","Bolts of 1 in and larger: hydraulic wrench or tensioner. No impact wrench, no hammering."]],
+
+b3:()=>[`${gauge(200,200,130,'data-init="rotate(-80deg)" data-m="1:rotate(-60deg)|2:rotate(0deg)|3:rotate(60deg)"',"",false)}
+<path d="M80 200A120 120 0 0 1 160 86" fill="none" stroke="var(--good)" stroke-width="14"/><path d="M168 82A120 120 0 0 1 240 84" fill="none" stroke="var(--k8)" stroke-width="14"/><path d="M248 87A120 120 0 0 1 320 200" fill="none" stroke="var(--bad)" stroke-width="14"/>
+${T(200,240,"","data-txt='1:score ≤ 13|2:score 14–18|3:score ≥ 19'",16,800,"var(--ink)","middle")}
+${pill(380,70,"Low: no record needed",'var(--good)','data-s="1"')}${pill(380,120,"Medium: recorded, 10% witnessed",'var(--k8)','data-s="2"')}${pill(380,170,"High: every joint witnessed",'var(--bad)','data-s="3"')}
+<g data-s="4"><rect x="390" y="210" width="90" height="50" rx="6" fill="var(--k8)"/>${T(435,240,"TAG","",14,800,"#fff","middle")}${T(490,240,"+ App. I sheet","",13,700)}</g>`,
+["Low criticality (score 13 or less): no record required.","Medium (14 to 18): recorded, and Inspection witnesses 10% at random.","High (19 or more): every joint witnessed, hydraulic tool used.","Critical joints get the App. I data sheet and a tag."]],
+
+/* ---- 5 Test pack and pressure test ---- */
+t0:()=>[`<g><path d="M250 120h140l10 -14h90v170h-240z" fill="var(--k8)"/><rect x="250" y="130" width="240" height="146" rx="6" fill="var(--k8)" opacity=".85"/>${T(370,210,"TEST PACK","",18,800,"#fff","middle")}</g>
+${[["Line list","var(--k0)",1],["Test diagram","var(--k0)",1],["P&ID","var(--k0)",1],["Isometrics","var(--k0)",1],["Weld summary","var(--k1)",2],["Flange reports","var(--k1)",2],["Gauge certs","var(--k4)",3],["RV cert","var(--k4)",3]].map(([t,c,s],i)=>`<g data-s="${s}" data-init="translate(${i%2?260:-260}px,-40px)" data-m="${s}:translate(0px,0px)"><rect x="${262+(i%4)*56}" y="${70+Math.floor(i/4)*26}" width="52" height="22" rx="4" fill="${c}"/><text x="${288+(i%4)*56}" y="${85+Math.floor(i/4)*26}" font-size="7.5" font-weight="800" fill="#fff" text-anchor="middle">${t}</text></g>`).join("")}
+${pill(20,40,"Engineering documents",'var(--k0)','data-s="1"',12)}${pill(20,80,"Construction records",'var(--k1)','data-s="2"',12)}${pill(20,120,"Test equipment records",'var(--k4)','data-s="3"',12)}
+<g data-s="4">${man(560,280)}${pill(20,250,"On site during the test · keep ≥ 5 years",'var(--k7)','',12)}</g>`,
+["Engineering documents: line list, test diagram, marked-up P&ID, isometrics, support drawings.","Construction records: the weld summary from welding QC, flange tightening and valve test reports.","Test equipment records: relief valve certificate, gauge calibration, manifold certificate, water analysis.","The approved procedure and pack are on site during the test. Records are kept at least 5 years."]],
+
+t1:()=>[`<line x1="60" y1="250" x2="600" y2="250" stroke="var(--ink)" stroke-width="2"/>
+${[["Pipe @ 90% SMYS",1840,"var(--k0)",1],["Flange Cl 300 × 1.5",1125,"var(--k4)",2],["Code min 1.5 × DP",900,"var(--muted)",4]].map(([t,v,c,s],i)=>`<g data-s="${s}"><rect x="${100+i*170}" y="${250-v/10}" width="110" height="${v/10}" rx="6" fill="${c}" data-init="scaleY(0)" data-m="${s}:scaleY(1)" style="transform-origin:bottom;transform-box:fill-box"/><text x="${155+i*170}" y="${242-v/10}" font-size="15" font-weight="800" fill="var(--ink)" text-anchor="middle">${v} psig</text><text x="${155+i*170}" y="272" font-size="12" font-weight="700" fill="var(--ink)" text-anchor="middle">${t}</text></g>`).join("")}
+<g data-s="3"><rect x="266" y="133" width="118" height="117" rx="8" fill="none" stroke="var(--k8)" stroke-width="4" class="pulse"/>${pill(400,110,"TP = lowest = 1125 psig",'var(--k8)')}</g>
+<g data-s="4"><line x1="60" y1="160" x2="600" y2="160" stroke="var(--bad)" stroke-width="2" stroke-dasharray="6 5"/>${tick(560,140)}</g>`,
+["Pipe limit: the pressure that gives a hoop stress of 90% SMYS (6 in Sch 40 A106 B ≈ 1840 psig).","Flange and valve limit: 1.5 × the 38 °C rating. Class 300 gives 1125 psig.","The test pressure is the lowest component limit.","Check it is not below the code minimum of 1.5 × design pressure. (Example: DP 600 psig.)"]],
+
+t2:()=>[`${pipe(20,200,600,28)}${vpipe(140,120,66,14)}${vpipe(470,90,96,14)}
+<g data-s="1">${gauge(140,92,34,'data-init="rotate(-90deg)" data-m="1:rotate(10deg)"')}${gauge(470,62,34,'data-init="rotate(-90deg)" data-m="1:rotate(14deg)"')}${T(140,150,"manifold","",11,700,"var(--ink)","middle")}${T(470,124,"highest point","",11,700,"var(--ink)","middle")}</g>
+${pill(190,36,"≥ 2 gauges, agree within 5%",'var(--k0)','data-s="1"',12)}
+<g data-s="2"><path d="M114 92A26 26 0 0 1 128 69" fill="none" stroke="var(--good)" stroke-width="0"/>${pill(190,76,"TP inside 30–80% of scale",'var(--good)','',12)}</g>
+<g data-s="3"><rect x="160" y="120" width="40" height="22" rx="3" fill="var(--k8)"/>${T(180,135,"CAL","",10,800,"#fff","middle")}${pill(210,131,"calibrated ≤ 30 days",'var(--k8)','',12)}</g>
+<g data-s="4">${vpipe(580,140,46,12)}<rect x="568" y="118" width="24" height="26" rx="4" fill="var(--k7)"/>${["","",""].map((_,i)=>`<circle cx="${580+(i-1)*10}" cy="${110-i*8}" r="${3+i}" fill="var(--water)" class="spray" style="animation-delay:${i*.3}s"/>`).join("")}${pill(380,250,"relief valve: TP + 5%",'var(--k7)','',12)}</g>`,
+["At least two gauges: one at the manifold and one at the highest point. They agree within 5%.","Pick a gauge range that puts TP between 30% and 80% of full scale.","Gauges are calibrated within 30 days, with the sticker on the gauge.","A test relief valve set at TP + 5% protects the line."]],
+
+t3:()=>[`${pipe(20,160,600,30)}
+<g data-s="1"><rect x="40" y="120" width="10" height="80" rx="2" fill="var(--k7)"/><rect x="590" y="120" width="10" height="80" rx="2" fill="var(--k7)"/>${pill(30,90,"test blinds of system class",'var(--k7)','',11)}</g>
+<g data-init="translate(0px,0px)" data-m="2:translate(0px,-110px)"><rect x="170" y="140" width="60" height="40" rx="6" fill="var(--k3)"/>${T(200,165,"CV","",13,800,"#fff","middle")}</g>
+<g data-s="2" data-init="translate(0px,60px)" data-m="2:translate(0px,0px)"><rect x="168" y="144" width="64" height="32" fill="var(--k1)"/>${T(200,165,"spool","",11,800,"#fff","middle")}</g>
+<g data-s="3"><rect x="330" y="140" width="56" height="40" rx="6" fill="var(--k4)"/><circle cx="358" cy="160" r="12" fill="#fff" data-init="translate(0px,0px)" data-m="3:translate(0px,-90px)"/>${T(358,206,"disc out","",11,700,"var(--k4)","middle")}</g>
+<g data-s="4">${vpipe(480,90,56,10)}${vpipe(520,175,50,10)}${T(480,82,"vent at high point","",11,700,"var(--water)","middle")}${T(520,240,"drain at low point","",11,700,"var(--water)","middle")}</g>
+<g data-s="5">${pill(30,260,"welds bare · PSVs, CVs, instruments out",'var(--k8)','',12)}</g>`,
+["Test blinds of the system's class close the test boundary.","Control valves, orifices, meters and instruments come out. A temporary spool goes in.","Check valves: disc removed, or the valve is by-passed.","A vent at every high point and a drain at every low point.","Welds stay bare and unpainted. PSVs, rupture discs and machinery stay out of the test."]],
+
+t4:()=>[`${ground(270)}
+<path d="M60 230H250V90H420V230H580" fill="none" stroke="var(--steelD)" stroke-width="34" stroke-linejoin="round"/><path d="M60 230H250V90H420V230H580" fill="none" stroke="var(--steelM)" stroke-width="28" stroke-linejoin="round"/>
+<path d="M60 230H250V90H420V230H580" fill="none" stroke="var(--water)" stroke-width="22" stroke-linejoin="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100" data-st="1:stroke-dashoffset=0|7:stroke-dashoffset=100" class="fillpath"/>
+<line x1="335" y1="74" x2="335" y2="50" stroke="var(--steelD)" stroke-width="10"/>${["","",""].map((_,i)=>`<circle cx="${335+(i-1)*6}" cy="${44-i*9}" r="${3+i}" fill="none" stroke="var(--muted)" stroke-width="2" class="spray" data-s="1" data-e="2" style="animation-delay:${i*.3}s"/>`).join("")}
+<rect x="20" y="214" width="40" height="32" rx="4" fill="var(--k1)"/>${T(40,234,"PUMP","",9,800,"#fff","middle")}
+${gauge(120,120,40,'data-init="rotate(-90deg)" data-m="2:rotate(-50deg)|3:rotate(10deg)|4:rotate(10deg)|5:rotate(10deg)|6:rotate(-20deg)|7:rotate(-90deg)"',"")}
+${T(120,186,"","data-txt='1:filling|2:½ TP check|3:TP 1125|4:TP 1125|5:hold 30 min|6:at DP|7:0'",13,800,"var(--ink)","middle")}
+<g data-init="translate(0px,0px)" data-m="4:translate(120px,0px)|6:translate(-150px,0px)|7:translate(0px,0px)">${man(470,270)}</g>
+${pill(440,40,"10 min: nobody near",'var(--k7)','data-s="4" data-e="5" class="blink"',12)}
+${pill(440,40,"hold ≥ 30 min",'var(--k4)','data-s="5" data-e="6"',12)}
+<g data-s="6"><path d="M330 190l-40 -30v60z" fill="var(--k8)" opacity=".5"/></g>${pill(440,40,"inspect every joint at DP",'var(--good)','data-s="6" data-e="7"',12)}
+${pill(440,40,"open vents first, then drain",'var(--water)','data-s="7"',12)}`,
+["Fill from the lowest point with every vent open, so the air escapes.","Raise to the lesser of ½ TP or 25 psi (170 kPa) and check for leaks.","Raise in steps to the test pressure.","At TP, isolate and disconnect the pump. Nobody approaches for 10 minutes.","Hold at least 30 minutes (2 hours for pipelines and buried lines).","Drop to design pressure and inspect every joint, flange and pad.","Depressurise, open the vents first, then drain. A leak means repair and retest from the start."]],
+
+t5:()=>[`${flange(200,140,90)}${flange(212,140,90)}${pipe(40,140,155,36)}${pipe(217,140,180,36)}
+<g data-s="1">${pill(300,40,"Pneumatic: written approval only",'var(--k7)','',12)}</g>
+<g data-s="2">${["","","","",""].map((_,i)=>`<circle cx="${206+(i%2?6:-6)}" cy="${100-i*12}" r="${4+i%3}" fill="none" stroke="var(--water)" stroke-width="2" class="drip" style="animation-delay:${i*.25}s"/>`).join("")}${pill(240,90,"soap bubble test at 5–10 psi",'var(--water)','',12)}</g>
+<g data-s="3">${pill(30,230,"stored energy ≤ 271 MJ per section",'var(--k8)','',12)}</g>
+<g data-s="4"><path d="M440 200h160" stroke="var(--k6)" stroke-width="6"/>${gauge(560,150,28,'data-init="rotate(-90deg)" data-m="4:rotate(-10deg)"',"")}${pill(420,250,"impulse lines: 1.1 × DP, 30 min",'var(--k6)','',12)}</g>`,
+["A pneumatic strength test needs written approval from Inspection.","Leak check pneumatic joints with a soap bubble test at 5 to 10 psi.","Stored energy is limited to 271 MJ per test section.","Instrument impulse lines are tested with air or N₂ at 1.1 × DP for 30 minutes."]],
+
+/* ---- 6 Cleaning and lay-up ---- */
+c0:()=>[`${pipe(30,150,480,50)}<rect x="34" y="132" width="472" height="36" fill="var(--water)" opacity=".6" data-s="1"/>
+${flowline("M40 150H500","#fff","data-s='1'",3)}
+${["","",""].map((_,i)=>`<rect x="${120+i*120}" y="${142+i*3}" width="12" height="8" fill="#7a5c2e" data-s="1" data-init="translate(0px,0px)" data-m="2:translate(${420-i*120}px,0px)"/>`).join("")}
+${pill(40,60,"water flush ≥ 3 m/s",'var(--water)','data-s="2"',12)}
+<g data-s="3"><rect x="570" y="100" width="12" height="100" fill="#c9a227"/><circle cx="576" cy="150" r="3" fill="var(--ink)" opacity=".2"/>${pill(380,240,"air blow ≥ 15 m/s · target plate clean",'var(--k8)','',12)}</g>
+<g data-s="4">${cross(260,60)}${T(282,65,"never seawater","",13,800,"var(--bad)")}</g>`,
+["Flush with plant or raw water. Remove orifices, CVs and soft-seated valves first.","High-velocity water flushing runs at 3 m/s or more and carries debris out.","Air or steam blowing: at least 15 m/s at the exit, until the target plate shows no impacts.","Never flush with seawater. For stainless, chloride must be below 50 mg/L."]],
+
+c1:()=>[`<g data-init="translate(-200px,0px)" data-m="1:translate(0px,0px)"><rect x="40" y="150" width="180" height="70" rx="30" fill="var(--water)"/><rect x="220" y="170" width="50" height="50" rx="6" fill="var(--k0)"/><circle cx="80" cy="226" r="14" fill="var(--ink)"/><circle cx="240" cy="226" r="14" fill="var(--ink)"/>${T(130,190,"TEST WATER","",12,800,"#fff","middle")}</g>
+<g data-s="2"><rect x="300" y="160" width="26" height="46" rx="6" fill="var(--card)" stroke="var(--ink)" stroke-width="2"/><rect x="302" y="180" width="22" height="24" rx="4" fill="var(--water)"/>${T(313,150,"sample","",11,700,"var(--ink)","middle")}</g>
+${[["SRB ≤ 1,000 /mL","var(--k1)"],["pH ≥ 5.5, no H₂S","var(--k0)"],["Cl ≤ 50 ppm for SS","var(--k6)"],["Filter 53 µm","var(--k4)"],["O₂ ≤ 20 ppb if long contact","var(--k8)"]].map(([t,c],i)=>pill(380,40+i*44,t,c,`data-s="${3+Math.floor(i/2)}"`,12)).join("")}`,
+["Test water arrives by tanker or from an approved source.","Each source or tanker is sampled within 2 weeks before filling.","Bacteria (SRB) ≤ 1,000 cells/mL; pH at least 5.5 with no H₂S.","Austenitic stainless: chloride ≤ 50 ppm. Filter removes 99% of particles ≥ 53 µm.","If water stays longer than 14 days (CS) or 4 days (SS), dissolved oxygen ≤ 20 ppb with scavenger."]],
+
+c2:()=>[`<rect x="30" y="40" width="130" height="120" rx="10" fill="var(--card)" stroke="var(--ink)" stroke-width="2"/><rect x="30" y="40" width="130" height="30" rx="10" fill="var(--k7)"/>${T(95,62,"DAYS","",13,800,"#fff","middle")}${T(95,130,"","data-txt='1:1|2:31|3:31|4:31|5:31'",44,800,"var(--ink)","middle")}
+${pill(30,200,"> 30 days?",'var(--k7)','data-s="2"',12)}
+<g data-s="3">${pipe(250,80,340,34)}<rect x="254" y="68" width="332" height="24" fill="var(--water)" opacity=".75"/>${pill(260,130,"Wet: ≥ 20 ppm scavenger, ≤ 20 ppb O₂",'var(--water)','',11)}</g>
+<g data-s="4">${pipe(250,190,340,34)}<rect x="254" y="178" width="332" height="24" fill="#f4e7c3" opacity=".9"/>${pill(260,240,"Dry: dew point ≤ −1 °C, then N₂",'var(--k8)','',11)}</g>
+${pill(260,280,"hold 30–50 psig · records to PMT",'var(--k4)','data-s="5"',11)}`,
+["The lay-up clock starts at the first fill, and refills add up.","If start-up is more than 30 days after first fill (14 for heat exchangers and stainless), lay-up is needed.","Wet lay-up: scavenger ≥ 20 ppm, O₂ ≤ 20 ppb, residuals checked monthly.","Dry lay-up: dry to a −1 °C dew point at every exit, then pack with nitrogen.","Hold wet, dry or nitrogen lay-up at 30 to 50 psig and send the records to PMT."]],
+
+/* ---- 7 Punch, NCR, MC ---- */
+p0:()=>[`<line x1="40" y1="160" x2="600" y2="160" stroke="var(--ink)" stroke-width="4"/>
+<g><path d="M330 145l12 15l-12 15l-12 -15z" fill="var(--water)"/>${T(330,200,"Pressure test","",13,800,"var(--ink)","middle")}</g><g><path d="M590 145l12 15l-12 15l-12 -15z" fill="var(--k1)"/>${T(590,200,"Handover","",13,800,"var(--ink)","end")}</g>
+<g data-init="translate(0px,0px)" data-m="2:translate(240px,0px)|4:translate(500px,0px)">${man(60,150)}</g>
+${["Supports","Torque","Weld status"].map((t,i)=>`<g data-s="1"><rect x="${60+i*86}" y="${60}" width="80" height="26" rx="6" fill="var(--k7)"/>${T(100+i*86,78,t,"",11,800,"#fff","middle")}${tick(130+i*86,58,'data-s="2"',9)}</g>`).join("")}${pill(60,30,"Punch A",'var(--k7)','data-s="1"',12)}
+${["Gaskets","Blinds","Insulation"].map((t,i)=>`<g data-s="3"><rect x="${360+i*86}" y="${60}" width="80" height="26" rx="6" fill="var(--k0)"/>${T(400+i*86,78,t,"",11,800,"#fff","middle")}${tick(430+i*86,58,'data-s="4"',9)}</g>`).join("")}${pill(360,30,"Punch B",'var(--k0)','data-s="3"',12)}
+${pill(40,250,"A before Aqua · B before Business",'var(--k8)','data-s="5"',13)}`,
+["Walk down the line before the test. Open items go on the punch list.","Punch A items (supports, torque, weld status) close before the water goes in.","Punch B items (gaskets, blinds, insulation, paint) can wait until after the test.","Punch B closes before handover. YES items close before the MC certificate.","Memory hook: A before Aqua, B before Business."]],
+
+p1:()=>[`${[["LBE","minor",1,"var(--k1)"],["NCR","moderate",2,"var(--k8)"],["WS","major",3,"var(--k7)"]].map(([a,b,s,c],i)=>`<g data-s="${s}"><rect x="${60+i*170}" y="${200-i*55}" width="160" height="${80+i*55}" rx="6" fill="${c}"/>${T(140+i*170,236-i*55,a,"",22,800,"#fff","middle")}${T(140+i*170,258-i*55,b,"",12,700,"#fff","middle")}</g>`).join("")}
+${man(140,200,'data-init="translate(0px,0px)" data-m="4:translate(170px,-55px)"')}
+${pill(380,70,"repeat in 6 months → next level",'var(--k4)','data-s="4"',12)}
+${pill(20,30,"NCR: root cause + corrective action",'var(--k0)','data-s="5"',12)}${pill(20,70,"approve in 5 working days",'var(--k0)','data-s="5"',12)}`,
+["A minor issue starts as a log book entry (LBE).","A moderate issue, and any Schedule Q breach, is an NCR.","A major issue (safety risk, forged documents, counterfeit material) starts at a worksheet (WS).","The same issue again within 6 months moves up a level.","An NCR states the broken requirement, root cause and corrective action. Approval within 5 working days."]],
+
+p2:()=>[`<rect x="60" y="30" width="250" height="240" rx="10" fill="var(--card)" stroke="var(--ink)" stroke-width="2"/>${T(185,60,"MECHANICAL COMPLETION","",12,800,"var(--ink)","middle")}
+${["Test packs signed","Punch B / YES closed","Lay-up in place","As-builts handed over"].map((t,i)=>`<g>${T(80,100+i*40,t,"",13,600,"var(--ink)")}${tick(285,95+i*40,`data-s="${i+1}"`,10)}</g>`).join("")}
+<g data-s="5" data-init="scale(2.2) rotate(-20deg)" data-m="5:scale(1) rotate(-12deg)"><rect x="380" y="100" width="190" height="80" rx="10" fill="none" stroke="var(--good)" stroke-width="6"/>${T(475,152,"MC ✓","",30,800,"var(--good)","middle")}</g>`,
+["Every test pack for the system is signed.","Punch B and every YES item are closed.","Lay-up is applied and recorded.","As-builts and dead-leg letters go to the owner.","The mechanical completion certificate can be signed."]],
+
+/* ---- 8 Reinstatement ---- */
+x0:()=>[`${pipe(20,160,600,30)}
+<g data-init="translate(0px,0px)" data-m="1:translate(0px,-120px)"><rect x="90" y="115" width="12" height="90" rx="2" fill="var(--k7)"/><rect x="88" y="200" width="16" height="30" rx="3" fill="var(--k7)"/>${T(96,108,"blind","",11,800,"var(--k7)","middle")}</g>
+${pill(20,270,"Blinds",'var(--k7)','data-s="1"',13)}
+<g data-s="2"><circle cx="240" cy="160" r="26" fill="none" stroke="#f2c94c" stroke-width="7" data-init="translate(0px,-110px)" data-m="2:translate(0px,0px)"/>${bolt(222,160)}${bolt(258,160)}</g>${pill(150,270,"Bolts",'var(--k4)','data-s="2"',13)}
+<g data-s="3" data-init="translate(0px,-120px)" data-m="3:translate(0px,0px)"><rect x="350" y="138" width="60" height="44" rx="6" fill="var(--k3)"/>${T(380,165,"CV","",13,800,"#fff","middle")}</g>${pill(300,270,"Bits",'var(--k3)','data-s="3"',13)}
+<g data-s="4">${valve(520,160,'data-init="rotate(0deg)" data-m="4:rotate(90deg)"',"var(--k1)")}</g>${pill(460,270,"Back",'var(--k1)','data-s="4"',13)}
+${pill(180,40,"Blinds · Bolts · Bits · Back",'var(--k8)','data-s="5"',15)}`,
+["Blinds: test blinds out, operating blinds as the P&ID shows, blind list signed.","Bolts: every opened joint gets a new gasket and a SAEP-351 bolt-up record.","Bits: CVs, orifices, PSVs, check valve discs and instruments go back in.","Back: valves to their operating position, spring stops out, vents and drains plugged.","Remember the four Bs. Then sign the reinstatement list with operations."]]
 };
 
-/* ---------- learn ---------- */
-function renderStagePick(){
-  $("#stagepick").innerHTML = S.map(s=>`<button aria-pressed="${s.id===cur}" data-s="${s.id}"><span class="n">${s.n}</span>${esc(s.name)}<span class="done ${done[s.id]?'on':''}" title="${done[s.id]?'studied':'not yet studied'}"></span></button>`).join("");
+/* ---------- helpers and state ---------- */
+const $=(q,el=document)=>el.querySelector(q);
+const esc=t=>String(t).replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}if(k!=="pqc-days"&&/srs|topics|sec/.test(k))markActive()}};
+const today=Math.floor(Date.now()/864e5);
+const INT=[0,1,2,4,8,16,32];
+const SC={f:"var(--k0)",r:"var(--k1)",st:"var(--k2)",e:"var(--k3)",b:"var(--k4)",t:"var(--k5)",c:"var(--k6)",p:"var(--k7)",x:"var(--k8)"};
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const pick=(a,n)=>shuffle(a.slice()).slice(0,n);
+let srs=store.get("pqc-srs",{}), TP=store.get("pqc2-topics",{}), SEC=store.get("pqc2-sec",{});
+function markActive(){const d=store.get("pqc-days",[]);if(!d.includes(today)){d.push(today);try{localStorage.setItem("pqc-days",JSON.stringify(d.slice(-400)))}catch(e){}}}
+
+/* topics = every chunk of every stage */
+const TOPICS=[];
+S.forEach(s=>s.chunks.forEach((c,ci)=>TOPICS.push({key:s.id+ci,s,ci,c})));
+const topicByKey=Object.fromEntries(TOPICS.map(t=>[t.key,t]));
+const CARDS=[];
+S.forEach(s=>s.chunks.forEach((c,ci)=>c.p.forEach((p,pi)=>CARDS.push({id:s.id+"-"+ci+"-"+pi,s:s.id,t:s.id+ci,stage:s.name,chunk:c.h,q:p[0],a:p[1],src:p[2],why:p[3]||""}))));
+const cardById=Object.fromEntries(CARDS.map(c=>[c.id,c]));
+const dueCards=()=>CARDS.filter(c=>srs[c.id]&&srs[c.id].d<=today);
+
+/* standard families, for "which standard?" questions */
+function fam(src){
+  const m=String(src).match(/SAES-[A-Z]-\d+|SAEP-\d+|SAIC-[A-Z]-\d+|GI-[\d.]+|ASME B\d+\.\d+|B31\.3|B16\.\d+|API (?:RP )?\d+|ASTM A\d+|NACE MR\d+|EN 10204/);
+  if(!m) return null; let f=m[0]; if(/^B\d/.test(f)) f="ASME "+f; return f;
 }
-function renderStage(){
-  const s = S.find(x=>x.id===cur);
-  let h = `<div class="stagehead"><div class="eyebrow">Stage ${s.n} of 8</div><h2>${esc(s.name)}</h2>
-  <div class="tagcard"><span class="k">Memory tag</span><span class="m">${esc(s.tag)}</span><span class="x">${esc(s.tagx)}</span></div></div>`;
-  s.chunks.forEach((c,ci)=>{
-    h += `<article class="chunk"><header><h3>${esc(c.h)}</h3><span class="c">${c.p.length} points</span></header><ul class="pts">`;
-    c.p.forEach(p=>{
-      h += `<li class="pt"><div class="l">${esc(p[0])}</div><div class="v" tabindex="0">${esc(p[1])}</div><div class="meta"><span class="src">${esc(p[2])}</span>${p[4]?'<span class="flag">verify</span>':''}${p[3]?`<span class="why"><b>Why:</b> ${esc(p[3])}</span>`:''}</div></li>`;
-    });
-    h += `</ul>${c.fig?`<div class="figure">${FIG[c.fig]()}</div>`:''}</article>`;
-  });
-  if(s.table){h+=`<article class="chunk"><header><h3>${esc(s.table.h)}</h3></header><div class="tbl" style="padding:4px 8px 8px"><table><tr><th>Topic</th><th>ASME B31.3</th><th>Saudi Aramco</th></tr>${s.table.rows.map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td>${esc(r[2])}</td></tr>`).join("")}</table></div></article>`}
-  h += `<article class="chunk"><div class="traps" style="border-top:0"><h4>Traps you will see on site</h4><ul>${s.traps.map(t=>`<li>${esc(t)}</li>`).join("")}</ul></div><div class="say"><h4>Say it in the interview</h4><p>"${esc(s.say)}"</p></div></article>`;
-  const i = S.indexOf(s);
-  h += `<div class="row" style="justify-content:space-between">${i>0?`<button class="btn" data-go="${S[i-1].id}">← ${esc(S[i-1].name)}</button>`:'<span></span>'}${i<S.length-1?`<button class="btn primary" data-go="${S[i+1].id}">${esc(S[i+1].name)} →</button>`:''}</div>`;
-  $("#stagebody").innerHTML = h;
-  $("#markdone").textContent = done[s.id] ? "Studied ✓ (tap to undo)" : "Mark stage studied";
-  if($("#starsvg")) runStar();
+const FAMS=[...new Set(CARDS.map(c=>fam(c.src)).filter(Boolean))];
+const FAM_ABOUT={"SAES-L-350":"construction of plant piping","SAES-L-310":"design of plant piping","SAES-L-150":"pressure testing of piping","SAES-A-004":"pressure testing (general)","SAES-A-007":"hydrotest water and lay-up","SAEP-351":"bolted flange joint assembly","SAEP-1151":"inspection levels and ITP points","SAEP-381":"nonconformance (NCR) escalation","SAES-L-108":"valves","SAES-L-109":"flanges, gaskets and bolting","SAES-L-110":"threaded joints","SAES-L-105":"line classes","SAES-L-100":"applicable codes","SAEP-302":"waivers","SAES-J-600":"pressure relief valves","SAES-J-700":"control valves","SAES-B-067":"safety colours and line marking","API RP 578":"material verification (PMI)","API 598":"valve testing","EN 10204":"material certificate types","ASME B31.3":"process piping code","ASME B16.5":"flange ratings","ASME B16.20":"metallic gaskets","NACE MR0175":"sour service materials","ASTM A106":"carbon steel pipe","GI-0002.710":"mechanical completion","GI-0002.102":"pressure test safety","API RP 686":"machinery installation"};
+
+/* ---------- question generation ---------- */
+function numVariants(v){
+  const nums=[...v.matchAll(/\d+(?:[.,]\d+)?/g)]; if(!nums.length) return [];
+  const m=nums[Math.floor(Math.random()*nums.length)], raw=m[0], n=parseFloat(raw.replace(",","")), dec=(raw.split(".")[1]||"").length;
+  const cands=shuffle([.5,2,1.5,.75,1.25,3,.6,1.2].map(k=>n*k)).concat([n+1,n-1,n+5,n+10]);
+  const out=[];
+  for(const c of cands){ if(c<=0) continue; let s=dec?c.toFixed(dec):String(Math.round(c)); if(raw.includes(",")&&!dec) s=Number(s).toLocaleString("en-US"); if(s===raw) continue; const nv=v.slice(0,m.index)+s+v.slice(m.index+raw.length); if(nv!==v&&!out.includes(nv)) out.push(nv); if(out.length>=3) break; }
+  return out;
 }
-let starTimer=null;
-function runStar(){
-  clearInterval(starTimer);
-  const order=[1,5,3,7,2,6,4,8], reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if(reduce){ $("#starpass").textContent="Pass 1 33% · Pass 2 66% · Pass 3 100% · Pass 4 100% check"; return;}
-  let step=0;
-  starTimer=setInterval(()=>{
-    const svg=$("#starsvg"); if(!svg){clearInterval(starTimer);return;}
-    const pass=Math.floor(step/8)%4, k=step%8;
-    if(k===0) svg.querySelectorAll(".bolt").forEach(b=>b.classList.remove("hit"));
-    svg.querySelector(`[data-b="${order[k]}"]`).classList.add("hit");
-    svg.querySelectorAll("[data-pass]").forEach(r=>r.setAttribute("stroke-width", +r.dataset.pass===pass?"3":"1.2"));
-    $("#starpass").textContent=`Pass ${pass+1} of 4 · bolt ${order[k]}`;
-    step=(step+1)%32;
-  },650);
+function makeForward(card){
+  let wrong=numVariants(card.a);
+  if(wrong.length<3){
+    const pool=CARDS.filter(c=>c.id!==card.id&&c.s===card.s&&c.a!==card.a&&Math.abs(c.a.length-card.a.length)<card.a.length+20).map(c=>c.a);
+    wrong=wrong.concat(pick([...new Set(pool)],3-wrong.length));
+  }
+  const opts=shuffle([card.a,...wrong.slice(0,3)]);
+  const f=fam(card.src);
+  return {type:"Know the value",eyebrow:f?`As per ${f}`:"On site",q:card.q,opts,ans:opts.indexOf(card.a),src:card.src,why:card.why,card:card.id,stage:card.s};
 }
-$("#stagepick").addEventListener("click",e=>{const b=e.target.closest("button[data-s]");if(!b)return;cur=b.dataset.s;store.set("pqc-stage",cur);renderStagePick();renderStage();window.scrollTo({top:0})});
-$("#stagebody").addEventListener("click",e=>{
-  const g=e.target.closest("[data-go]"); if(g){cur=g.dataset.go;store.set("pqc-stage",cur);renderStagePick();renderStage();window.scrollTo({top:0});return;}
-  const v=e.target.closest(".v"); if(v&&document.body.classList.contains("recall")) v.classList.toggle("shown");
+function makeReverse(card){
+  const f=fam(card.src); if(!f) return null;
+  const wrong=pick(FAMS.filter(x=>x!==f),3), opts=shuffle([f,...wrong]);
+  return {type:"Which standard?",eyebrow:"Which Aramco standard or code deals with this?",q:"Which document sets this rule?",rule:`${card.q}: ${card.a}`,opts,ans:opts.indexOf(f),src:card.src,why:FAM_ABOUT[f]?`${f} covers ${FAM_ABOUT[f]}.`:"",card:card.id,stage:card.s,optNote:true};
+}
+function fromMCQ(m){
+  const opts=m[2].map((t,i)=>({t,i})); shuffle(opts);
+  return {type:"Site question",eyebrow:"",q:m[1],opts:opts.map(o=>o.t),ans:opts.findIndex(o=>o.i===m[3]),src:m[4],why:"",stage:m[0]};
+}
+function topicQuiz(key){
+  const t=topicByKey[key], cards=CARDS.filter(c=>c.t===key);
+  const hand=MCQ.map((m,i)=>[m,i]).filter(([m,i])=>m[0]===t.s.id&&MCQ_CHUNK[i]===t.ci).map(([m])=>fromMCQ(m));
+  const qs=pick(hand,3);
+  const rev=pick(cards.filter(c=>fam(c.src)),2).map(makeReverse).filter(Boolean); qs.push(...rev);
+  const used=new Set(rev.map(q=>q.card));
+  pick(cards.filter(c=>!used.has(c.id)),Math.max(0,6-qs.length)).forEach(c=>qs.push(makeForward(c)));
+  return shuffle(qs).slice(0,6);
+}
+function sectionQuiz(sid){
+  const cards=CARDS.filter(c=>c.s===sid);
+  const qs=pick(MCQ.filter(m=>m[0]===sid),4).map(fromMCQ);
+  pick(cards.filter(c=>fam(c.src)),3).forEach(c=>{const q=makeReverse(c);if(q)qs.push(q)});
+  pick(cards,10-qs.length).forEach(c=>qs.push(makeForward(c)));
+  return shuffle(qs).slice(0,10);
+}
+function mixedQuiz(onlyReverse){
+  if(onlyReverse) return pick(CARDS.filter(c=>fam(c.src)),10).map(makeReverse);
+  const doneKeys=Object.keys(TP); const pool=doneKeys.length?CARDS.filter(c=>doneKeys.includes(c.t)):CARDS;
+  const qs=pick(MCQ.filter((m,i)=>!doneKeys.length||doneKeys.includes(m[0]+MCQ_CHUNK[i])),4).map(fromMCQ);
+  pick(pool.filter(c=>fam(c.src)),3).forEach(c=>qs.push(makeReverse(c)));
+  pick(pool,10-qs.length).forEach(c=>qs.push(makeForward(c)));
+  return shuffle(qs).slice(0,10);
+}
+
+/* ---------- navigation ---------- */
+const TABS={learn:"learn",topic:"learn",recap:"learn",run:"quiz",cards:"cards",quiz:"quiz",tools:"tools",calc:"tools",numbers:"tools",plan:"tools",fixes:"tools"};
+const TITLE={learn:"Piping QC",cards:"Flashcards",quiz:"Quiz",tools:"Tools",calc:"Test pressure",numbers:"Numbers",plan:"8-week plan",fixes:"Sources"};
+let view="learn", backTo=null;
+function setSC(color){document.body.style.setProperty("--sc",color||"var(--k0)")}
+function show(v,opts={}){
+  view=v; Object.keys(TABS).forEach(x=>{const el=$("#v-"+x);if(el)el.hidden=x!==v});
+  document.querySelectorAll("#tabbar button").forEach(b=>b.setAttribute("aria-selected",b.dataset.v===TABS[v]));
+  backTo=opts.back||({topic:"learn",recap:"learn",calc:"tools",numbers:"tools",plan:"tools",fixes:"tools",run:null}[v]??null);
+  $("#backbtn").hidden=!backTo; $("#backbtn").textContent="‹ "+({learn:"Topics",tools:"Tools",topic:"Topic",quiz:"Quiz"}[backTo]||"Back");
+  if(opts.title) $("#apptitle").textContent=opts.title; else if(TITLE[v]) $("#apptitle").textContent=TITLE[v];
+  if(v==="learn"){setSC();renderHome()}
+  if(v==="cards"){setSC();if(!queue.length)startDeck();renderBoxes()}
+  if(v==="quiz"){setSC();renderHub()}
+  if(v==="tools"||TABS[v]==="tools") setSC();
+  if(v!=="topic") stopScene();
+  window.scrollTo(0,0);
+  try{history.replaceState(null,"","#"+(v==="topic"&&opts.key?opts.key:v))}catch(e){}
+}
+$("#tabbar").addEventListener("click",e=>{const b=e.target.closest("button");if(b)show(b.dataset.v)});
+$("#backbtn").addEventListener("click",()=>{if(backTo==="topic"&&curTopic)openTopic(curTopic);else show(backTo||"learn")});
+
+/* ---------- home ---------- */
+function nextTopic(){return TOPICS.find(t=>!TP[t.key])||TOPICS[0]}
+function renderHome(){
+  const done=TOPICS.filter(t=>TP[t.key]).length, pct=Math.round(done/TOPICS.length*100), nx=nextTopic(), due=dueCards().length;
+  const days=new Set(store.get("pqc-days",[]));let streak=0,d=days.has(today)?today:today-1;while(days.has(d)){streak++;d--}
+  $("#home").innerHTML=`
+  <div class="hero"><div><h2>${done?"Keep going, you're doing well":"Let's start from zero"}</h2><p>${done} of ${TOPICS.length} topics done. Each topic: key points, a site animation, a summary, then a quiz.</p></div><div class="ring" style="--p:${pct}"><b>${pct}%</b></div></div>
+  <button class="cont" style="--sc:${SC[nx.s.id]}" data-open="${nx.key}"><span class="ic">${nx.s.n}</span><span><span class="eyebrow">${TP[nx.key]?"Review":"Continue"} · ${esc(nx.s.name)}</span><b>${esc(nx.c.h)}</b></span></button>
+  <div class="stats"><button class="stat" data-go="cards"><b style="color:var(--k7)">${due}</b><span>cards due</span></button><button class="stat" data-go="quiz"><b style="color:var(--k6)">${Object.keys(SEC).length}/9</b><span>section tests</span></button><button class="stat"><b style="color:var(--k2)">${streak}</b><span>day streak</span></button></div>
+  ${S.map(s=>{const ts=TOPICS.filter(t=>t.s===s),dn=ts.filter(t=>TP[t.key]).length;return `<article class="sec" style="--sc:${SC[s.id]}"><header><span class="num">${s.n}</span><div><h3>${esc(s.name)}</h3><div class="tagline">${esc(s.tag)}</div><div class="bar"><i style="width:${dn/ts.length*100}%"></i></div></div></header>
+   <ul class="tlist">${ts.map((t,i)=>{const r=TP[t.key];return `<li><button data-open="${t.key}"><span class="dot ${r?(r.best>=80?"star":"done"):""}">${r?(r.best>=80?"★":"✓"):i+1}</span><span><span class="tt">${esc(t.c.h)}</span><br><span class="ts">${t.c.p.length} points · site animation · quiz</span></span>${r?`<span class="score">${r.best}%</span>`:"<span></span>"}</button></li>`}).join("")}
+   <li class="test"><button data-recap="${s.id}"><span class="dot ${SEC[s.id]!=null?(SEC[s.id]>=80?"star":"done"):""}">${SEC[s.id]!=null?(SEC[s.id]>=80?"★":"✓"):"⚑"}</span><span><span class="tt">Section summary and test</span><br><span class="ts">Recap, site traps, interview line, 10 questions</span></span>${SEC[s.id]!=null?`<span class="score">${SEC[s.id]}%</span>`:"<span></span>"}</button></li></ul></article>`}).join("")}`;
+}
+$("#home").addEventListener("click",e=>{
+  const o=e.target.closest("[data-open]"); if(o) return openTopic(o.dataset.open);
+  const r=e.target.closest("[data-recap]"); if(r) return openRecap(r.dataset.recap);
+  const g=e.target.closest("[data-go]"); if(g) show(g.dataset.go);
 });
-$("#stagebody").addEventListener("keydown",e=>{const v=e.target.closest(".v");if(v&&(e.key==="Enter"||e.key===" ")){e.preventDefault();v.classList.toggle("shown")}});
-$("#recallmode").addEventListener("change",e=>{document.body.classList.toggle("recall",e.target.checked);store.set("pqc-recall",e.target.checked);document.querySelectorAll(".v.shown").forEach(v=>v.classList.remove("shown"))});
-$("#markdone").addEventListener("click",()=>{
-  if(done[cur]) delete done[cur]; else { done[cur]=today; CARDS.filter(c=>c.s===cur).forEach(c=>{ if(!srs[c.id]) srs[c.id]={b:1,d:today}; }); store.set("pqc-srs",srs); }
-  store.set("pqc-done",done); renderStagePick(); renderStage(); renderToday(); fillDeck();
+
+/* ---------- topic ---------- */
+let curTopic=null;
+function openTopic(key){
+  const t=topicByKey[key]; if(!t) return show("learn"); curTopic=key; store.set("pqc2-last",key);
+  setSC(SC[t.s.id]);
+  const idx=TOPICS.indexOf(t), ts=TOPICS.filter(x=>x.s===t.s), pos=ts.indexOf(t)+1;
+  $("#topicbody").innerHTML=`
+  <div class="thero"><span class="eyebrow">Section ${t.s.n} · ${esc(t.s.name)} · topic ${pos} of ${ts.length}</span><h2>${esc(t.c.h)}</h2><div class="row"><span class="chip" style="background:rgba(255,255,255,.2);color:#fff">${t.c.p.length} points</span><span class="chip" style="background:rgba(255,255,255,.2);color:#fff">site animation</span><span class="chip" style="background:rgba(255,255,255,.2);color:#fff">${TP[key]?"best "+TP[key].best+"%":"quiz at the end"}</span></div></div>
+  <nav class="steps"><a href="#" data-jump="pts" class="on"><i></i>Points</a><a href="#" data-jump="site" class="on"><i></i>On site</a><a href="#" data-jump="sumry" class="on"><i></i>Summary</a><a href="#" data-jump="fin" class="${TP[key]?"on":""}"><i></i>Quiz</a></nav>
+  <div class="panel" id="pts"><div class="secthead"><h3><span class="n">1</span>Key points</h3><label class="toggle"><input type="checkbox" id="recallmode" ${document.body.classList.contains("recall")?"checked":""}> Hide values</label></div>
+   <ul class="bul">${t.c.p.map(p=>`<li><div><span class="lab">${esc(p[0])}:</span> <span class="val" tabindex="0">${esc(p[1])}</span><div class="meta"><span class="src">${esc(p[2])}</span>${p[4]?'<span class="flag">verify</span>':""}${p[3]?`<span class="why">Why: ${esc(p[3])}</span>`:""}</div></div></li>`).join("")}</ul></div>
+  <div class="panel" id="site"><div class="secthead"><h3><span class="n">2</span>See it on site</h3><span class="muted" style="font-size:13px">swipe or tap ‹ ›</span></div><div id="scenebox"></div></div>
+  <div class="sum" id="sumry"><h3 style="display:flex;gap:8px;align-items:center"><span class="n" style="width:26px;height:26px;border-radius:8px;background:var(--sc);color:#fff;display:grid;place-items:center;font-size:16px">3</span>Summary: remember this</h3><ol>${(SUM[key]||[]).map(x=>`<li>${esc(x)}</li>`).join("")}</ol>${pos===ts.length?`<div class="hook">${esc(t.s.tag)}</div>`:""}</div>
+  <div id="fin" class="stack"><button class="btn primary big" id="finish">Finish topic and take the quiz (6 questions)</button>
+  <div class="row" style="justify-content:space-between">${idx>0?`<button class="btn" data-open="${TOPICS[idx-1].key}">‹ ${esc(TOPICS[idx-1].c.h)}</button>`:"<span></span>"}${TP[key]&&idx<TOPICS.length-1?`<button class="btn" data-open="${TOPICS[idx+1].key}">${esc(TOPICS[idx+1].c.h)} ›</button>`:""}</div>
+  ${TP[key]?"":`<p class="muted" style="font-size:13px;text-align:center">The next topic unlocks after this quiz.</p>`}</div>`;
+  show("topic",{title:t.s.name,key});
+  mountScene($("#scenebox"),key);
+}
+$("#topicbody").addEventListener("click",e=>{
+  const j=e.target.closest("[data-jump]"); if(j){e.preventDefault();$("#"+j.dataset.jump).scrollIntoView({behavior:"smooth",block:"start"});return}
+  const o=e.target.closest("[data-open]"); if(o) return openTopic(o.dataset.open);
+  if(e.target.id==="finish") return runQuiz({kind:"topic",key:curTopic,title:topicByKey[curTopic].c.h,qs:topicQuiz(curTopic)});
+  const v=e.target.closest(".val"); if(v&&document.body.classList.contains("recall")) v.classList.toggle("shown");
+});
+$("#topicbody").addEventListener("change",e=>{if(e.target.id==="recallmode"){document.body.classList.toggle("recall",e.target.checked);store.set("pqc-recall",e.target.checked)}});
+
+/* ---------- scene player ---------- */
+let sceneTimer=null, scene=null;
+function stopScene(){clearInterval(sceneTimer);sceneTimer=null}
+function mountScene(box,key){
+  stopScene(); const f=SCENES[key]; if(!f){box.innerHTML="";return}
+  const [svg,caps]=f();
+  box.innerHTML=`<div class="scene"><svg viewBox="0 0 ${W_} ${H_}" role="img" aria-label="${esc(caps.join(" "))}">${DEFS}${svg}</svg><div class="cap"><b>1</b><p></p></div><div class="ctl"><button data-a="prev" aria-label="Previous step">‹</button><button data-a="play" aria-label="Play or pause">❚❚</button><div class="pips">${caps.map(()=>"<i></i>").join("")}</div><button data-a="next" aria-label="Next step">›</button></div></div>`;
+  const root=box.querySelector(".scene"), el=root.querySelector("svg");
+  el.querySelectorAll("[data-init]").forEach(n=>n.style.transform=n.dataset.init);
+  scene={root,el,caps,step:1,playing:!matchMedia("(prefers-reduced-motion: reduce)").matches};
+  setStep(1,true); if(scene.playing) play(); else root.querySelector('[data-a="play"]').textContent="▶";
+  root.querySelector(".ctl").onclick=e=>{const b=e.target.closest("button");if(!b)return;const a=b.dataset.a;
+    if(a==="play"){scene.playing?pause():play();return} pause(); setStep(scene.step+(a==="next"?1:-1))};
+  let x0=null; root.addEventListener("touchstart",e=>{x0=e.touches[0].clientX},{passive:true});
+  root.addEventListener("touchend",e=>{if(x0==null)return;const dx=e.changedTouches[0].clientX-x0;if(Math.abs(dx)>40){pause();setStep(scene.step+(dx<0?1:-1))}x0=null});
+}
+function play(){scene.playing=true;scene.root.querySelector('[data-a="play"]').textContent="❚❚";stopScene();sceneTimer=setInterval(()=>{if(!scene||!document.body.contains(scene.root))return stopScene();setStep(scene.step>=scene.caps.length?1:scene.step+1,scene.step>=scene.caps.length)},3400)}
+function pause(){if(!scene)return;scene.playing=false;stopScene();scene.root.querySelector('[data-a="play"]').textContent="▶"}
+function setStep(n,reset){
+  const s=scene; n=Math.max(1,Math.min(s.caps.length,n)); s.step=n;
+  if(reset) s.el.querySelectorAll("[data-init]").forEach(x=>{x.style.transition="none";x.style.transform=x.dataset.init;x.getBoundingClientRect();x.style.transition=""});
+  s.el.querySelectorAll("[data-s],[data-e]").forEach(x=>{const a=+(x.dataset.s||0),b=+(x.dataset.e||99);x.style.opacity=(n>=a&&n<b)?1:0});
+  s.el.querySelectorAll("[data-m]").forEach(x=>{let t=x.dataset.init||"";x.dataset.m.split("|").forEach(p=>{const i=p.indexOf(":");if(n>=+p.slice(0,i))t=p.slice(i+1)});x.style.transform=t});
+  s.el.querySelectorAll("[data-st]").forEach(x=>{x.dataset.st.split("|").forEach(p=>{const i=p.indexOf(":"),[k,v]=p.slice(i+1).split("=");if(n>=+p.slice(0,i))x.style[k.replace(/-(\w)/g,(_,c)=>c.toUpperCase())]=v;else if(+p.slice(0,i)===1)x.style.strokeDashoffset=""})});
+  s.el.querySelectorAll("[data-txt]").forEach(x=>{let t="";x.dataset.txt.split("|").forEach(p=>{const i=p.indexOf(":");if(n>=+p.slice(0,i))t=p.slice(i+1)});x.textContent=t});
+  s.root.querySelector(".cap b").textContent=n; s.root.querySelector(".cap p").textContent=s.caps[n-1];
+  s.root.querySelectorAll(".pips i").forEach((p,i)=>p.classList.toggle("on",i===n-1));
+}
+
+/* ---------- section recap ---------- */
+let curRecap=null;
+function openRecap(sid){
+  curRecap=sid;
+  const s=S.find(x=>x.id===sid); setSC(SC[sid]); const ts=TOPICS.filter(t=>t.s===s);
+  const idx=S.indexOf(s);
+  $("#recapbody").innerHTML=`<div class="thero"><span class="eyebrow">Section ${s.n} summary</span><h2>${esc(s.name)}</h2><div style="font:700 24px var(--display)">${esc(s.tag)}</div><p style="opacity:.92">${esc(s.tagx)}</p></div>
+  <div class="panel"><h3>The most important points</h3>${ts.map(t=>`<div><div class="eyebrow" style="color:var(--sc)">${esc(t.c.h)}</div><ul class="bul" style="margin-top:6px">${(SUM[t.key]||[]).map(x=>`<li><div>${esc(x)}</div></li>`).join("")}</ul></div>`).join("")}</div>
+  ${s.table?`<div class="panel"><h3>${esc(s.table.h)}</h3><div class="tbl"><table><tr><th>Topic</th><th>B31.3</th><th>Aramco</th></tr>${s.table.rows.map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td>${esc(r[2])}</td></tr>`).join("")}</table></div></div>`:""}
+  <div class="traps"><h4>Traps you will see on site</h4><ul>${s.traps.map(t=>`<li>${esc(t)}</li>`).join("")}</ul></div>
+  <div class="say"><h4>Say it in the interview</h4><p>"${esc(s.say)}"</p></div>
+  <button class="btn primary big" id="sectest">Take the section test (10 questions)</button>
+  ${idx<S.length-1&&SEC[sid]!=null?`<button class="btn big" data-next="${S[idx+1].id}">Next section: ${esc(S[idx+1].name)} ›</button>`:""}`;
+  show("recap",{title:s.name});
+}
+$("#recapbody").addEventListener("click",e=>{
+  if(e.target.id==="sectest"){const st=S.find(x=>x.id===curRecap);runQuiz({kind:"section",sid:st.id,title:"Section test: "+st.name,qs:sectionQuiz(st.id)})}
+  const n=e.target.closest("[data-next]"); if(n){const t=TOPICS.find(t=>t.s.id===n.dataset.next);openTopic(t.key)}
+});
+
+/* ---------- quiz runner ---------- */
+let Q=null;
+function runQuiz(cfg){Q={...cfg,i:0,score:0,ans:null};if(cfg.kind==="topic")setSC(SC[topicByKey[cfg.key].s.id]);else if(cfg.kind==="section")setSC(SC[cfg.sid]);show("run",{title:cfg.title,back:cfg.kind==="topic"?"topic":cfg.kind==="section"?"learn":"quiz"});renderQ()}
+function renderQ(){
+  const el=$("#runbody");
+  if(Q.i>=Q.qs.length) return renderResult();
+  const q=Q.qs[Q.i], a=Q.ans;
+  el.innerHTML=`<div class="qtop"><div class="row" style="justify-content:space-between"><span class="eyebrow">Question ${Q.i+1} of ${Q.qs.length}</span><span class="eyebrow">Score ${Q.score}</span></div><div class="qbar"><i style="width:${Q.i/Q.qs.length*100}%"></i></div></div>
+  <div class="qcard"><span class="chip qtype">${esc(q.type)}</span>${q.eyebrow?`<span class="eyebrow">${esc(q.eyebrow)}</span>`:""}<div class="q">${esc(q.q)}</div>${q.rule?`<div class="rule">${esc(q.rule)}</div>`:""}
+  <div class="opts">${q.opts.map((o,i)=>`<button class="opt ${a!==null?(i===q.ans?"right":i===a?"wrong":""):""}" data-i="${i}" ${a!==null?"disabled":""}><span class="l">${"ABCD"[i]}</span><span>${esc(o)}${q.optNote&&a!==null&&FAM_ABOUT[o]?`<br><small class="muted">${esc(FAM_ABOUT[o])}</small>`:""}</span></button>`).join("")}</div>
+  ${a!==null?`<div class="fb ${a===q.ans?"ok":"no"}"><b>${a===q.ans?"Correct.":"Not quite."}</b> ${a===q.ans?"":`The answer is <b>${esc(q.opts[q.ans])}</b>. `}${q.why?esc(q.why)+" ":""}<span class="src">${esc(q.src)}</span></div><button class="btn primary big" id="qnext">${Q.i+1<Q.qs.length?"Next question":"See my score"}</button>`:""}</div>`;
+}
+$("#runbody").addEventListener("click",e=>{
+  if(!Q) return;
+  const o=e.target.closest(".opt"); if(o&&Q.ans===null){const q=Q.qs[Q.i];Q.ans=+o.dataset.i;if(Q.ans===q.ans)Q.score++;else if(q.card){srs[q.card]={b:1,d:today+1};store.set("pqc-srs",srs)}markActive();renderQ();return}
+  if(e.target.id==="qnext"){Q.i++;Q.ans=null;renderQ();window.scrollTo(0,0);return}
+  const b=e.target.closest("[data-act]"); if(!b) return; const act=b.dataset.act;
+  if(act==="retry") runQuiz({...Q,qs:Q.kind==="topic"?topicQuiz(Q.key):Q.kind==="section"?sectionQuiz(Q.sid):mixedQuiz(Q.kind==="reverse")});
+  if(act==="topic") openTopic(b.dataset.k); if(act==="recap") openRecap(b.dataset.k); if(act==="home") show("learn"); if(act==="hub") show("quiz");
+});
+function renderResult(){
+  const pct=Math.round(Q.score/Q.qs.length*100), el=$("#runbody"); let btns="";
+  if(Q.kind==="topic"){
+    const r=TP[Q.key]||{best:0}; TP[Q.key]={done:r.done||today,best:Math.max(r.best||0,pct),last:pct}; store.set("pqc2-topics",TP);
+    CARDS.filter(c=>c.t===Q.key).forEach(c=>{if(!srs[c.id])srs[c.id]={b:1,d:today+1}}); store.set("pqc-srs",srs);
+    const t=topicByKey[Q.key], i=TOPICS.indexOf(t), nx=TOPICS[i+1], lastInSec=!nx||nx.s!==t.s;
+    btns=(lastInSec?`<button class="btn primary big" data-act="recap" data-k="${t.s.id}">Section summary and test ›</button>`:`<button class="btn primary big" data-act="topic" data-k="${nx.key}">Next topic: ${esc(nx.c.h)} ›</button>`)+`<button class="btn big" data-act="retry">Retry this quiz</button><button class="btn big" data-act="topic" data-k="${Q.key}">Review the topic</button>`;
+  }else if(Q.kind==="section"){
+    SEC[Q.sid]=Math.max(SEC[Q.sid]||0,pct); store.set("pqc2-sec",SEC);
+    const i=S.findIndex(s=>s.id===Q.sid), nx=S[i+1];
+    btns=(nx?`<button class="btn primary big" data-act="topic" data-k="${TOPICS.find(t=>t.s===nx).key}">Next section: ${esc(nx.name)} ›</button>`:`<button class="btn primary big" data-act="hub">Mixed quizzes ›</button>`)+`<button class="btn big" data-act="retry">Retry the test</button><button class="btn big" data-act="recap" data-k="${Q.sid}">Back to the summary</button>`;
+  }else btns=`<button class="btn primary big" data-act="retry">Another round</button><button class="btn big" data-act="hub">Quiz menu</button>`;
+  el.innerHTML=`<div class="qcard result"><div class="bigring" style="--p:${pct}"><b>${pct}%</b></div><h2>${pct>=80?"Excellent!":pct>=60?"Good. Nearly there.":"Keep practising"}</h2><p class="muted">${Q.score} of ${Q.qs.length} correct. ${pct>=80?"You've earned a star.":"Missed points are now flashcards due tomorrow. Review the topic, then retry."}</p><div class="stack" style="width:100%">${btns}</div></div>`;
+  if(pct>=80) confetti();
+}
+function confetti(){if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;const c=document.createElement("div");c.className="confetti";const cols=["var(--k0)","var(--k1)","var(--k2)","var(--k4)","var(--k6)","var(--k8)"];c.innerHTML=Array.from({length:60},(_,i)=>`<i style="left:${Math.random()*100}%;background:${cols[i%6]};animation-delay:${Math.random()*.6}s;animation-duration:${1.8+Math.random()*1.4}s"></i>`).join("");document.body.appendChild(c);setTimeout(()=>c.remove(),3600)}
+
+/* ---------- quiz hub ---------- */
+function renderHub(){
+  $("#hub").innerHTML=`<button class="hubbtn" style="--sc:var(--k6)" data-q="mixed"><span class="ic">10</span><span><b>Mixed quiz</b><span>From the topics you've finished, in random order</span></span></button>
+  <button class="hubbtn" style="--sc:var(--k1)" data-q="reverse"><span class="ic">?</span><span><b>Which standard?</b><span>Reverse questions: which SAES, SAEP or code sets the rule</span></span></button>
+  <h3 style="margin-top:6px">Section tests</h3>
+  ${S.map(s=>`<button class="hubbtn" style="--sc:${SC[s.id]}" data-sec="${s.id}"><span class="ic">${s.n}</span><span><b>${esc(s.name)}</b><span>${SEC[s.id]!=null?"Best "+SEC[s.id]+"%":"Not taken yet"} · 10 questions</span></span></button>`).join("")}`;
+}
+$("#hub").addEventListener("click",e=>{
+  const b=e.target.closest("button"); if(!b) return;
+  if(b.dataset.q==="mixed") runQuiz({kind:"mixed",title:"Mixed quiz",qs:mixedQuiz(false)});
+  if(b.dataset.q==="reverse") runQuiz({kind:"reverse",title:"Which standard?",qs:mixedQuiz(true)});
+  if(b.dataset.sec) openRecap(b.dataset.sec);
 });
 
 /* ---------- flashcards ---------- */
-let queue=[], qi=0, flipped=false, sessionN=0;
-function dueCards(){return CARDS.filter(c=>srs[c.id]&&srs[c.id].d<=today)}
-function fillDeck(){
-  const due=dueCards().length;
-  $("#deck").innerHTML = `<option value="due">Due today (${due})</option>` + S.map(s=>`<option value="${s.id}">Stage ${s.n}: ${esc(s.name)} (${CARDS.filter(c=>c.s===s.id).length})</option>`).join("") + `<option value="all">Everything, shuffled</option>`;
-}
-function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
-function startDeck(){
-  const v=$("#deck").value;
-  queue = v==="due"?dueCards():v==="all"?CARDS.slice():CARDS.filter(c=>c.s===v);
-  queue = shuffle(queue.map(c=>c.id)); qi=0; flipped=false; sessionN=queue.length; renderCard(); renderBoxes();
-}
-function renderBoxes(){
-  const counts=[0,0,0,0,0,0,0]; Object.values(srs).forEach(r=>counts[Math.min(r.b,6)]++);
-  const fresh = CARDS.length-Object.keys(srs).length;
-  $("#boxes").innerHTML = `<span class="b">Not started ${fresh}</span>` + [1,2,3,4,5,6].map(b=>`<span class="b">Box ${b} · ${INT[b]}d · ${counts[b]}</span>`).join("");
-}
+let queue=[],qi=0,flipped=false,cmode=store.get("pqc2-cmode","value");
+function fillDeck(){$("#deck").innerHTML=`<option value="due">Due today (${dueCards().length})</option>`+S.map(s=>`<option value="${s.id}">Section ${s.n}: ${esc(s.name)} (${CARDS.filter(c=>c.s===s.id).length})</option>`).join("")+`<option value="all">Everything, shuffled</option>`}
+function startDeck(){const v=$("#deck").value||"due";queue=shuffle((v==="due"?dueCards():v==="all"?CARDS.slice():CARDS.filter(c=>c.s===v)).map(c=>c.id));qi=0;flipped=false;renderCard()}
+function renderBoxes(){const n=[0,0,0,0,0,0,0];Object.values(srs).forEach(r=>n[Math.min(r.b,6)]++);$("#boxes").innerHTML=`<span>New ${CARDS.length-Object.keys(srs).length}</span>`+[1,2,3,4,5,6].map(b=>`<span>Box ${b} · ${INT[b]}d · ${n[b]}</span>`).join("");const d=dueCards().length,bd=$("#duebadge");bd.hidden=!d;bd.textContent=d>99?"99+":d}
 function renderCard(){
   const el=$("#card");
-  $("#drillbar").style.width = sessionN? ((sessionN-queue.length+qi)/sessionN*100)+"%" : "0";
-  if(qi>=queue.length){
-    el.innerHTML = queue.length||sessionN ? `<div class="q">Deck done.</div><p class="muted">Come back tomorrow for the cards that are due. Or pick a stage deck above to preview new cards.</p><div class="row"><button class="btn primary" id="again">Run this deck again</button></div>` :
-      `<div class="q">Nothing due yet.</div><p class="muted">Mark a stage as studied on the Learn tab and its cards join your schedule. You can also pick a stage deck above to start now.</p>`;
-    const a=$("#again"); if(a) a.onclick=startDeck; return;
-  }
-  const c=cardById[queue[qi]], r=srs[c.id];
-  el.innerHTML = `<div class="row" style="justify-content:space-between"><span class="eyebrow">${esc(c.stage)} · ${esc(c.chunk)}</span><span class="eyebrow">${qi+1} / ${queue.length} · ${r?'box '+r.b:'new'}</span></div>
-   <div class="q">${esc(c.q)}</div>
-   ${flipped?`<div class="a">${esc(c.a)}</div><div class="row"><span class="src">${esc(c.src)}</span>${c.why?`<span class="why"><b>Why:</b> ${esc(c.why)}</span>`:''}</div>
-   <div class="grade"><button class="btn bad" id="miss">Didn't know</button><button class="btn good" id="hit">Knew it</button></div>`
-   :`<div class="row"><button class="btn primary" id="flip">Show answer</button><span class="muted" style="font-size:13px">Say it out loud first</span></div>`}`;
-  if(!flipped) $("#flip").onclick=()=>{flipped=true;renderCard()};
-  else { $("#miss").onclick=()=>grade(false); $("#hit").onclick=()=>grade(true); }
+  if(qi>=queue.length){setSC();el.innerHTML=`<div class="panel" style="text-align:center"><h3>${queue.length?"Deck done!":"Nothing due right now"}</h3><p class="muted">${queue.length?"Come back tomorrow for the next due cards.":"Finish a topic quiz and its points join your flashcards. Or pick a section deck above."}</p>${queue.length?`<button class="btn primary" id="again">Run this deck again</button>`:""}</div>`;const a=$("#again");if(a)a.onclick=startDeck;return}
+  const c=cardById[queue[qi]], r=srs[c.id], f=fam(c.src), rev=cmode==="std"&&f; setSC(SC[c.s]);
+  el.innerHTML=`<div class="flip ${flipped?"on":""}" id="flipper"><div class="inner"><div class="face front"><span class="eyebrow">${esc(c.stage)} · ${esc(c.chunk)}</span><div class="q">${rev?`Which standard: ${esc(c.q)}?`:esc(c.q)}</div>${rev?`<div class="a" style="font-size:16px">${esc(c.a)}</div>`:""}<span class="eyebrow">${qi+1} / ${queue.length} · ${r?"box "+r.b:"new"} · tap to flip</span></div>
+  <div class="face back"><span class="eyebrow" style="color:var(--sc)">${esc(c.q)}</span><div class="a">${rev?esc(f):esc(c.a)}</div><div class="row"><span class="src">${esc(c.src)}</span>${c.why?`<span class="why">Why: ${esc(c.why)}</span>`:""}</div></div></div></div>
+  <div class="grade" ${flipped?"":"hidden"}><button class="btn bad" id="miss">Didn't know</button><button class="btn good" id="hit">Knew it</button></div>`;
+  $("#flipper").onclick=()=>{flipped=!flipped;$("#flipper").classList.toggle("on",flipped);el.querySelector(".grade").hidden=!flipped};
+  $("#miss").onclick=()=>grade(false); $("#hit").onclick=()=>grade(true);
 }
-function grade(ok){
-  const id=queue[qi]; const r=srs[id]||{b:0,d:today};
-  if(ok){r.b=Math.min((r.b||0)+1,6); r.d=today+INT[r.b];}
-  else {r.b=1; r.d=today+1; queue.push(id);}
-  srs[id]=r; store.set("pqc-srs",srs); qi++; flipped=false; renderCard(); renderBoxes(); renderToday();
-}
+function grade(ok){const id=queue[qi],r=srs[id]||{b:0,d:today};if(ok){r.b=Math.min((r.b||0)+1,6);r.d=today+INT[r.b]}else{r.b=1;r.d=today+1;queue.push(id)}srs[id]=r;store.set("pqc-srs",srs);qi++;flipped=false;renderCard();renderBoxes()}
 $("#deck").addEventListener("change",startDeck);
+$("#cmode").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;cmode=b.dataset.m;store.set("pqc2-cmode",cmode);document.querySelectorAll("#cmode button").forEach(x=>x.setAttribute("aria-pressed",x===b));flipped=false;renderCard()});
+document.querySelectorAll("#cmode button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.m===cmode));
 
-/* ---------- quiz ---------- */
-let qset=[], qpos=0, qscore=0, qans=null;
-function fillQsrc(){$("#qsrc").innerHTML=`<option value="all">All stages, mixed</option><option value="studied">Stages I marked studied</option>`+S.map(s=>`<option value="${s.id}">Stage ${s.n}: ${esc(s.name)}</option>`).join("")}
-function startQuiz(){
-  const v=$("#qsrc").value; let pool=MCQ.map((m,i)=>i);
-  if(v==="studied"){const ids=Object.keys(done);pool=pool.filter(i=>ids.includes(MCQ[i][0]));}
-  else if(v!=="all") pool=pool.filter(i=>MCQ[i][0]===v);
-  qset=shuffle(pool).slice(0,10); qpos=0; qscore=0; qans=null; renderQ();
-}
-function renderQ(){
-  const el=$("#qbox");
-  if(!qset.length){el.innerHTML=`<div class="q">No questions for that choice yet.</div><p class="muted">Mark a stage as studied, or pick "All stages, mixed".</p>`;return}
-  if(qpos>=qset.length){
-    const pct=Math.round(qscore/qset.length*100);
-    el.innerHTML=`<div class="q">${qscore} of ${qset.length} (${pct}%)</div><p class="muted">${pct>=80?"Good. Space your next round: come back tomorrow, not in five minutes.":"The flashcards for your misses are back in box 1 and due tomorrow. Re-read those chunks with Recall mode on."}</p><div class="row"><button class="btn primary" id="qagain">Another round</button></div>`;
-    $("#qagain").onclick=startQuiz; return;
-  }
-  const m=MCQ[qset[qpos]]; const st=S.find(s=>s.id===m[0]);
-  if(!m.ord) m.ord=shuffle([0,1,2,3]);
-  el.innerHTML=`<div class="row" style="justify-content:space-between"><span class="eyebrow">Stage ${st.n} · ${esc(st.name)}</span><span class="eyebrow">Question ${qpos+1} / ${qset.length} · score ${qscore}</span></div>
-  <div class="q" style="font-size:clamp(20px,3.2vw,26px)">${esc(m[1])}</div>
-  <div class="opts">${m.ord.map(o=>`<button class="opt ${qans!==null?(o===m[3]?'right':(o===qans?'wrong':'')):''}" data-o="${o}" ${qans!==null?'disabled':''}>${esc(m[2][o])}</button>`).join("")}</div>
-  ${qans!==null?`<div class="row"><span class="src">${esc(m[4])}</span><span class="muted">${qans===m[3]?'Correct.':'The right answer is highlighted.'}</span><button class="btn primary" id="qnext" style="margin-left:auto">Next</button></div>`:''}`;
-  el.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
-    qans=+b.dataset.o;
-    if(qans===m[3]) qscore++;
-    else { CARDS.filter(c=>c.s===m[0]&&(m[1].toLowerCase().includes(c.q.toLowerCase().split(" ")[0]))).slice(0,1).forEach(c=>{srs[c.id]={b:1,d:today+1}}); store.set("pqc-srs",srs); }
-    renderQ();
-  });
-  const n=$("#qnext"); if(n) n.onclick=()=>{qpos++;qans=null;delete m.ord;renderQ()};
-}
-$("#qstart").addEventListener("click",startQuiz);
+/* ---------- tools ---------- */
+$("#toolmenu").addEventListener("click",e=>{const b=e.target.closest("[data-open]");if(b)show(b.dataset.open)});
+$("#numtbl").innerHTML=`<tr><th>Item</th><th>Value</th><th>Source</th></tr>`+KEYN.map(r=>`<tr><td>${esc(r[0])}</td><td class="mono nv">${esc(r[1])}</td><td><span class="src">${esc(r[2])}</span></td></tr>`).join("");
+$("#numhide").addEventListener("change",e=>document.querySelectorAll(".nv").forEach(td=>td.classList.toggle("hid",e.target.checked)));
+$("#numtbl").addEventListener("click",e=>{const td=e.target.closest("tr")?.querySelector(".nv");if(td&&$("#numhide").checked)td.classList.toggle("hid")});
+$("#fixtbl").innerHTML=`<tr><th>Change</th><th>What</th><th>Reason</th></tr>`+FIXES.map(f=>`<tr><td><b>${f[0]}</b></td><td>${esc(f[1])}</td><td class="muted">${esc(f[2])}</td></tr>`).join("");
+function applyTheme(t){if(t==="auto")delete document.documentElement.dataset.theme;else document.documentElement.dataset.theme=t;document.querySelectorAll("#themeseg button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.t===t))}
+$("#themeseg").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;store.set("pqc-theme",b.dataset.t);applyTheme(b.dataset.t)});
+applyTheme(store.get("pqc-theme","auto"));
+function allData(){const o={};try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k.startsWith("pqc"))o[k]=localStorage.getItem(k)}}catch(e){}return o}
+$("#bk-copy").addEventListener("click",async()=>{const code="PQC1:"+btoa(unescape(encodeURIComponent(JSON.stringify(allData()))));$("#bk-area").hidden=false;$("#bk-text").value=code;try{await navigator.clipboard.writeText(code);$("#bk-msg").textContent="Copied. Paste it into Notes."}catch(e){$("#bk-text").select();$("#bk-msg").textContent="Select the code above and copy it."}});
+$("#bk-show").addEventListener("click",()=>{$("#bk-area").hidden=false;$("#bk-text").value="";$("#bk-msg").textContent="";$("#bk-text").focus()});
+$("#bk-restore").addEventListener("click",()=>{try{const o=JSON.parse(decodeURIComponent(escape(atob($("#bk-text").value.trim().replace(/^PQC1:/,"")))));Object.entries(o).forEach(([k,v])=>{if(k.startsWith("pqc"))localStorage.setItem(k,v)});$("#bk-msg").textContent="Restored. Reloading…";setTimeout(()=>location.reload(),600)}catch(e){$("#bk-msg").textContent="That code didn't work. Copy the whole code, starting with PQC1:"}});
+let resetArmed=0;
+$("#reset").addEventListener("click",()=>{const b=$("#reset");if(Date.now()-resetArmed>4000){resetArmed=Date.now();b.textContent="Tap again to delete all progress";setTimeout(()=>{if(Date.now()-resetArmed>=4000)b.textContent="Reset all progress"},4100);return}try{Object.keys(allData()).forEach(k=>localStorage.removeItem(k))}catch(e){}location.reload()});
 
 /* ---------- calculator ---------- */
 const PIPE={ "2":[2.375,{40:.154,80:.218,160:.344}], "3":[3.5,{40:.216,80:.300,160:.438}], "4":[4.5,{40:.237,80:.337,160:.531}], "6":[6.625,{40:.280,80:.432,160:.719}], "8":[8.625,{40:.322,80:.500,160:.906}], "10":[10.75,{40:.365,80:.594,160:1.125}], "12":[12.75,{40:.406,80:.688,160:1.312}] };
@@ -1224,14 +1532,7 @@ function drawGauge(tp,g){
 }
 ["c-nps","c-sch","c-mat","c-cls","c-dp"].forEach(id=>$("#"+id).addEventListener("input",calc));
 
-/* ---------- numbers ---------- */
-const KEYN=[["Fit-up location","± 3 mm","L-350 §9.1"],["Branch offset","± 1.5 mm","L-350 §9.3"],["Flange bolt-hole rotation","± 2.4 mm","L-350 §9.4"],["Flange face tilt","≤ 1.6 mm","L-350 §9.4"],["Bend flattening","≤ 5% (3% at ends)","L-350 §9.2"],["Seamless mill tolerance","−12.5%","ASTM A106"],["Sour CS hardness","≤ 22 HRC","NACE MR0175"],["Min size, hazardous","¾ in","L-310 §9.2"],["Dead leg","3D or 1.22 m, lesser","L-310 §10.4"],["Small branch to obstruction","≥ 610 mm","L-310 §11.5"],["Pipe to structure / pipe","≥ 120 mm","L-310 §11.4"],["Buried cover / under roads","450 / 750 mm","L-310 §12.3.3"],["Dummy weep hole","6 mm","L-310 §13.7.2"],["Pump suction straight run","≥ 5D","L-310 §10.7"],["Machinery face tilt max","0.672 mm","L-350 §9.5"],["Bolt-up passes","33-66-100-100%","SAEP-351 §9.2"],["8-bolt order","1-5-3-7-2-6-4-8","SAEP-351 App. E"],["No hand wrench","bolts ≥ 1 in","SAEP-351 §8.4"],["Tool calibration","± 5%","SAEP-351 §8.2"],["Spiral-wound seat finish","3.2–6.4 µm Ra","SAEP-351"],["Hydro TP","90% SMYS unless components limit","L-150 §7.1"],["Cl 150 / 300 / 600 TP","450 / 1125 / 2225 psig","B16.5"],["Stand-off at TP","10 min","A-004 §6.1.2"],["Hold, plant / pipeline","30 min / 2 h","L-150"],["Preliminary check","½ TP or 170 kPa, lesser","A-004 §6.1.4"],["Test relief valve","TP + 5%","A-004 §5.7.1"],["Gauges","≥ 2, 30–80%, ≤ 30 days","A-004 §5.12.6"],["Manifold test","≥ 1.2 × TP","A-004 App. B"],["Pneumatic energy","≤ 271 MJ","A-004 App. A"],["HP water jet","≥ 60.8 MPa","L-350 App. A"],["HVWF velocity","≥ 3 m/s","L-350 App. A"],["Air blow velocity","≥ 15 m/s","L-350 App. A"],["PASB","≤ 810 kPa","L-350 App. A"],["SS chloride","≤ 50 ppm","A-007"],["SRB","≤ 1,000 /mL","A-007"],["Water pH","≥ 5.5","A-007"],["Lay-up trigger","30 d (14 HX, SS)","A-007 §7.1"],["Wet lay-up","20 ppm / 20 ppb / 30–50 psig","A-007 §7.4"],["Dry lay-up dew point","≤ −1 °C","A-007 §7.5"],["NCR approval","5 working days","SAEP-381"],["Records kept","≥ 5 years","A-004 §6.4"]];
-$("#numtbl").innerHTML=`<tr><th>Item</th><th>Value</th><th>Source</th></tr>`+KEYN.map((r,i)=>`<tr data-i="${i}" style="cursor:pointer"><td>${esc(r[0])}</td><td class="mono nv">${esc(r[1])}</td><td><span class="src">${esc(r[2])}</span></td></tr>`).join("");
-$("#numhide").addEventListener("change",e=>document.querySelectorAll(".nv").forEach(td=>td.style.filter=e.target.checked?"blur(6px)":""));
-$("#numtbl").addEventListener("click",e=>{const tr=e.target.closest("tr[data-i]");if(!tr)return;const td=tr.querySelector(".nv");if($("#numhide").checked){td.style.filter=td.style.filter?"":"blur(6px)";return}
-  const k=KEYN[+tr.dataset.i][0].toLowerCase().split(/[ ,/]/)[0];const c=CARDS.find(c=>c.q.toLowerCase().includes(k));if(c){srs[c.id]={b:1,d:today};store.set("pqc-srs",srs);tr.style.background="var(--tag-soft)";renderToday();fillDeck();}});
 
-/* ---------- plan ---------- */
 function renderPlan(){
   const startStr=store.get("pqc-start",""); $("#startdate").value=startStr;
   const start=startStr?Date.parse(startStr):null;
@@ -1258,148 +1559,25 @@ function renderPlan(){
 }
 $("#startdate").addEventListener("change",e=>{store.set("pqc-start",e.target.value);renderPlan()});
 
-/* ---------- other ---------- */
-$("#methods").innerHTML=METHODS.map(m=>`<div class="method"><span class="k">${esc(m[0])}</span><h3>${esc(m[1])}</h3><p class="muted" style="font-size:14px">${esc(m[2])}</p><p style="font-size:14px"><b>Here:</b> ${esc(m[3])}</p></div>`).join("");
-$("#fixtbl").innerHTML=`<tr><th>Change</th><th>What</th><th>Reason</th></tr>`+FIXES.map(f=>`<tr><td><span class="chip ${f[0]==='Added'?'new':f[0]==='Flagged'?'mock':'rev'}">${f[0]}</span></td><td>${esc(f[1])}</td><td class="muted">${esc(f[2])}</td></tr>`).join("");
 
-/* ---------- app shell ---------- */
-const VIEWS=["today","learn","drill","quiz","more","calc","numbers","plan","method","fixes"];
-const SUB={calc:"Test pressure",numbers:"Numbers",plan:"8-week plan",method:"How to study",fixes:"What changed"};
-const TITLES={today:"Today",learn:"Field Book",drill:"Flashcards",quiz:"Quiz",more:"More",...SUB};
-let curView="today";
-function show(v){
-  if(!VIEWS.includes(v)) v="today";
-  curView=v;
-  VIEWS.forEach(x=>{$("#v-"+x).hidden=x!==v});
-  const tab=SUB[v]?"more":v;
-  document.querySelectorAll("#tabbar button").forEach(b=>b.setAttribute("aria-selected",b.dataset.v===tab));
-  $("#apptitle").textContent=TITLES[v];
-  $("#backbtn").hidden=!SUB[v];
-  if(v==="drill"&&!queue.length) startDeck();
-  if(v==="quiz"&&!qset.length) startQuiz();
-  if(v==="today") renderToday();
-  window.scrollTo(0,0);
-  try{history.replaceState(null,"","#"+v)}catch(err){}
-}
-$("#tabbar").addEventListener("click",e=>{const b=e.target.closest("button");if(b)show(b.dataset.v)});
-$("#backbtn").addEventListener("click",()=>show("more"));
-document.querySelector("#v-more .menu").addEventListener("click",e=>{const b=e.target.closest("[data-open]");if(b)show(b.dataset.open)});
-
-/* activity log for the streak */
-function dayKey(){return Math.floor(Date.now()/864e5)}
-function markActive(){const d=store.get("pqc-days",[]),k=dayKey();if(!d.includes(k)){d.push(k);store.set("pqc-days",d.slice(-400))}}
-const _set=store.set.bind(store);
-store.set=(k,v)=>{_set(k,v);if(k==="pqc-srs"||k==="pqc-done")markActive()};
-$("#qbox").addEventListener("click",e=>{if(e.target.closest(".opt"))markActive()},true);
-
-/* flashcards: tap the card to flip */
-$("#card").addEventListener("click",e=>{if(!flipped&&qi<queue.length&&!e.target.closest("button,select")){flipped=true;renderCard()}});
-
-/* 8-week plan, as data */
-const LEARN_DAY={f:1,r:8,st:11,e:15,b:22,t:29,c:36,p:39,x:41};
-function planDays(){
-  const days=Array.from({length:56},()=>({n:[],r:[],m:false}));
-  S.forEach(s=>{const d=LEARN_DAY[s.id];days[d-1].n.push(s);[1,3,7,14,30].forEach(k=>{const x=d+k;if(x<=56)days[x-1].r.push(s)})});
-  [43,46,49,52,55].forEach(d=>days[d-1].m=true);
-  return days;
-}
-function localISO(dt){return dt.getFullYear()+"-"+String(dt.getMonth()+1).padStart(2,"0")+"-"+String(dt.getDate()).padStart(2,"0")}
-function planIndex(){
-  const s=store.get("pqc-start","");if(!s)return null;
-  const [y,m,d]=s.split("-").map(Number), now=new Date();
-  return Math.round((new Date(now.getFullYear(),now.getMonth(),now.getDate())-new Date(y,m-1,d))/864e5)+1;
-}
-
-/* today */
-function renderToday(){
-  const due=dueCards().length, studied=Object.keys(done).length, started=Object.keys(srs).length;
-  $("#today").innerHTML=`<div class="stat"><b>${due}</b><span>cards due</span></div><div class="stat"><b>${studied}/9</b><span>stages studied</span></div><div class="stat"><b>${started}/${CARDS.length}</b><span>cards started</span></div>`;
-  const bd=$("#duebadge");bd.hidden=!due;bd.textContent=due>99?"99+":due;
-  const idx=planIndex(); let learnStage=null, head, sub, eyebrow;
-  if(idx===null){
-    eyebrow="8-week plan";head="Start your 8 weeks";
-    sub=`Tap below to make today Day 1. The app then tells you what to learn and review each day. <br><button class="btn primary" id="startplan" style="margin-top:10px">Start my plan today</button>`;
-  }else if(idx<1){
-    eyebrow="8-week plan";head=`Starts in ${1-idx} day${idx===0?"":"s"}`;sub="Until then, preview Stage 0 on the Learn tab.";
-  }else if(idx>56){
-    eyebrow="Plan complete";head="Keep it fresh";sub="Do your due cards each day and one mixed quiz. That keeps every number ready for the interview.";
-  }else{
-    const x=planDays()[idx-1];eyebrow=`Week ${Math.ceil(idx/7)} · Day ${idx} of 56`;
-    if(x.n.length){learnStage=x.n[0];head=`Learn: ${learnStage.name}`}
-    else if(x.m){head="Mock exam day"}
-    else if(x.r.length){head="Review day"}
-    else{head=(idx%7===0)?"Light day":"Cards + quiz"}
-    const bits=[];
-    if(x.r.length) bits.push("Review "+x.r.map(s=>`stage ${s.n} (${s.name})`).join(", ")+" with Recall mode on.");
-    if(x.m) bits.push("Do three quiz rounds from all stages, then re-study only what you missed.");
-    if(!x.n.length&&!x.r.length&&!x.m) bits.push(idx%7===0?"Due cards only today.":"Due cards and one mixed quiz.");
-    if(idx>=50) bits.push("Week 8: say every \"Say it in the interview\" line out loud.");
-    sub=bits.join(" ");
-  }
-  $("#planday").textContent=eyebrow;$("#planhead").textContent=head;$("#plansub").innerHTML=sub;
-  const sp=$("#startplan");if(sp)sp.onclick=()=>{store.set("pqc-start",localISO(new Date()));renderPlan();renderToday()};
-  const r=store.get("pqc-routine",{d:0,x:{}}); if(r.d!==dayKey()){r.d=dayKey();r.x={}}
-  const target=learnStage||(planIndex()&&planIndex()>0&&planIndex()<=56&&planDays()[planIndex()-1].r[0])||S.find(s=>s.id===cur);
-  const items=[
-    ["quiz","Cold quiz","5 min · 10 mixed questions, before you look at notes","quiz"],
-    ["learn",learnStage?`Learn stage ${learnStage.n}: ${learnStage.name}`:`Study stage ${target.n}: ${target.name}`,"25 min · Recall mode on, tap each value to check","learn"],
-    ["cards",`Due flashcards (${due})`,"30 min · say the answer before you flip","drill"],
-    ["say","Explain one point aloud","5 min · use the stage's interview line","learn"]];
-  $("#routine").innerHTML=items.map(([k,t,s,go])=>`<li class="${r.x[k]?'on':''}"><input type="checkbox" data-k="${k}" ${r.x[k]?'checked':''} aria-label="${esc(t)} done"><div><div class="t">${esc(t)}</div><div class="s">${esc(s)}</div></div><button class="btn" data-go2="${go}" data-stage="${k==='learn'||k==='say'?target.id:''}">Go</button></li>`).join("");
-  $("#routine").onchange=e=>{const k=e.target.dataset.k;if(!k)return;r.x[k]=e.target.checked;store.set("pqc-routine",r);if(e.target.checked)markActive();renderToday()};
-  $("#routine").onclick=e=>{const b=e.target.closest("[data-go2]");if(!b)return;if(b.dataset.stage){cur=b.dataset.stage;store.set("pqc-stage",cur);renderStagePick();renderStage()}if(b.dataset.go2==="quiz")startQuiz();show(b.dataset.go2)};
-  const days=new Set(store.get("pqc-days",[])),k=dayKey();let streak=0,d=days.has(k)?k:k-1;while(days.has(d)){streak++;d--}
-  const dots=Array.from({length:14},(_,i)=>k-13+i).map(x=>`<span title="" style="width:14px;height:14px;border-radius:4px;display:inline-block;background:${days.has(x)?'var(--good)':'var(--line)'}"></span>`).join("");
-  $("#streakbox").innerHTML=`<div class="row" style="justify-content:space-between"><h3>Study streak</h3><b style="font-family:var(--mono)">${streak} day${streak===1?"":"s"}</b></div><div class="row" style="gap:4px">${dots}</div><p class="muted" style="font-size:13px">Last 14 days. Consistency beats long sessions: a short session every day is what makes spacing work.</p>`;
-}
-
-/* appearance */
-function applyTheme(t){
-  if(t==="auto")delete document.documentElement.dataset.theme;else document.documentElement.dataset.theme=t;
-  document.querySelectorAll("#themeseg button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.t===t));
-}
-$("#themeseg").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;store.set("pqc-theme",b.dataset.t);applyTheme(b.dataset.t)});
-applyTheme(store.get("pqc-theme","auto"));
-
-/* backup and restore */
-function allData(){const o={};try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k.startsWith("pqc-"))o[k]=localStorage.getItem(k)}}catch(e){}return o}
-function toCode(o){return "PQC1:"+btoa(unescape(encodeURIComponent(JSON.stringify(o))))}
-$("#bk-copy").addEventListener("click",async()=>{
-  const code=toCode(allData());$("#bk-area").hidden=false;$("#bk-text").value=code;
-  try{await navigator.clipboard.writeText(code);$("#bk-msg").textContent="Copied. Paste it into Notes."}
-  catch(e){$("#bk-text").select();$("#bk-msg").textContent="Select the code above and copy it."}
-});
-$("#bk-show").addEventListener("click",()=>{$("#bk-area").hidden=false;$("#bk-text").value="";$("#bk-msg").textContent="";$("#bk-text").focus()});
-$("#bk-restore").addEventListener("click",()=>{
-  try{const raw=$("#bk-text").value.trim().replace(/^PQC1:/,"");const o=JSON.parse(decodeURIComponent(escape(atob(raw))));
-    Object.entries(o).forEach(([k,v])=>{if(k.startsWith("pqc-"))localStorage.setItem(k,v)});$("#bk-msg").textContent="Restored. Reloading…";setTimeout(()=>location.reload(),600)}
-  catch(e){$("#bk-msg").textContent="That code didn't work. Copy the whole code, starting with PQC1:"}
-});
-let resetArmed=0;
-$("#reset").addEventListener("click",()=>{
-  const b=$("#reset");
-  if(Date.now()-resetArmed>4000){resetArmed=Date.now();b.textContent="Tap again to delete all progress";setTimeout(()=>{if(Date.now()-resetArmed>=4000)b.textContent="Reset all progress"},4100);return}
-  try{Object.keys(allData()).forEach(k=>localStorage.removeItem(k))}catch(e){}location.reload();
-});
-
-/* offline */
+/* ---------- offline ---------- */
 let swReg=null;
-function setOffline(ready,msg){$("#offpill").hidden=!ready;$("#offtxt").textContent=msg}
 const standalone=navigator.standalone||matchMedia("(display-mode: standalone)").matches;
+function setOffline(msg){$("#offtxt").textContent=msg}
 if("serviceWorker" in navigator&&location.protocol!=="file:"){
-  navigator.serviceWorker.register("sw.js").then(reg=>{
-    swReg=reg;
-    navigator.serviceWorker.ready.then(()=>{$("#installtip").hidden=standalone;setOffline(true,"Everything is saved on this phone. The app works with no internet."+(standalone?"":" Add it to your Home Screen to use it like an app."))});
-    reg.addEventListener("updatefound",()=>{const w=reg.installing;w&&w.addEventListener("statechange",()=>{if(w.state==="installed"&&navigator.serviceWorker.controller){$("#offtxt").textContent="An update is ready. Close and reopen the app to use it."}})});
-  }).catch(()=>setOffline(false,"Offline mode isn't available on this page. Open the app from its own web address in Safari to install it."));
+  navigator.serviceWorker.register("sw.js").then(reg=>{swReg=reg;
+    navigator.serviceWorker.ready.then(()=>setOffline("Everything is saved on this phone. The app works with no internet."+(standalone?"":" Add it to your Home Screen from Safari: Share, then Add to Home Screen.")));
+    reg.addEventListener("updatefound",()=>{const w=reg.installing;w&&w.addEventListener("statechange",()=>{if(w.state==="installed"&&navigator.serviceWorker.controller)setOffline("An update is ready. Close and reopen the app to use it.")})});
+  }).catch(()=>setOffline("Offline mode isn't available on this page. Open the app from its web address in Safari."));
   if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
-}else setOffline(false,"Offline mode isn't available here. Open the app from its web address in Safari.");
-$("#upd").addEventListener("click",()=>{if(!swReg){$("#offtxt").textContent="No connection to the app's web address.";return}$("#offtxt").textContent="Checking…";swReg.update().then(()=>{if(!swReg.installing&&!swReg.waiting)$("#offtxt").textContent="You have the latest version."}).catch(()=>{$("#offtxt").textContent="You're offline. Try again with internet."})});
+}else setOffline("Offline mode isn't available here.");
+$("#upd").addEventListener("click",()=>{if(!swReg){setOffline("No connection to the app's web address.");return}setOffline("Checking…");swReg.update().then(()=>{if(!swReg.installing&&!swReg.waiting)setOffline("You have the latest version.")}).catch(()=>setOffline("You're offline. Try again with internet."))});
 
-/* boot */
-if(store.get("pqc-recall",false)){$("#recallmode").checked=true;document.body.classList.add("recall")}
-renderStagePick(); renderStage(); fillDeck(); fillQsrc(); calc(); renderPlan(); renderBoxes();
-show((location.hash||"").slice(1)||"today");
+/* ---------- boot ---------- */
+if(store.get("pqc-recall",false))document.body.classList.add("recall");
+fillDeck(); calc(); renderPlan(); renderBoxes();
+(()=>{const h=(location.hash||"").slice(1);if(topicByKey[h])openTopic(h);else show(TITLE[h]?h:"learn")})();
+
 </script>
 </body>
 </html>
