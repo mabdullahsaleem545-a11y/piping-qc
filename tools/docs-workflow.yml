@@ -1,0 +1,60 @@
+# Copy this file to .github/workflows/build-library.yml in the PRIVATE docs repo
+# (piping-qc-docs). It turns the SAES and SAEP zips into the app's encrypted
+# library and pushes only kb/manifest.json and kb/index.bin to the public app.
+#
+# Secrets needed in the private repo (Settings > Secrets and variables > Actions):
+#   INDEX_PASSPHRASE  the passphrase you type once in the app's Ask tab
+#   APP_REPO_TOKEN    fine-grained token with Contents: read and write on piping-qc
+#
+# Put the zips either as assets on a Release, or in a docs/ folder of the repo.
+name: Build library
+
+on:
+  release:
+    types: [published]
+  push:
+    paths: ["docs/**"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: docs-repo
+
+      - uses: actions/checkout@v4
+        with:
+          repository: mabdullahsaleem545-a11y/piping-qc
+          token: ${{ secrets.APP_REPO_TOKEN }}
+          path: app
+
+      - name: Collect zips from the latest release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p input
+          gh release download --repo "$GITHUB_REPOSITORY" --pattern '*.zip' --dir input || echo "No release assets"
+          if [ -d docs-repo/docs ]; then cp -r docs-repo/docs input/repo-docs; fi
+          ls -laR input | head -50
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build encrypted index
+        env:
+          INDEX_PASSPHRASE: ${{ secrets.INDEX_PASSPHRASE }}
+        run: |
+          pip install pypdf cryptography
+          python app/tools/build_index.py --out app/kb input
+
+      - name: Publish to the app
+        run: |
+          cd app
+          git config user.name "library-bot"
+          git config user.email "library-bot@users.noreply.github.com"
+          git add kb/manifest.json kb/index.bin
+          git commit -m "Update standards library" || exit 0
+          git push

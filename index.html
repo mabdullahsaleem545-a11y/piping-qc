@@ -130,7 +130,7 @@ header.appbar h1{font-size:27px;flex:1;min-width:0;white-space:nowrap;overflow:h
 .chip{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:3px 10px;font:600 12px var(--mono);background:color-mix(in srgb,var(--sc,var(--k0)) 14%,transparent);color:var(--sc,var(--k0))}
 /* bottom nav */
 nav.bottom{position:fixed;left:0;right:0;bottom:0;z-index:7;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
-nav.bottom .in{display:grid;grid-template-columns:repeat(4,1fr);max-width:640px;margin:0 auto}
+nav.bottom .in{display:grid;grid-template-columns:repeat(5,1fr);max-width:640px;margin:0 auto}
 nav.bottom button{display:grid;justify-items:center;gap:2px;background:none;border:0;padding:8px 0 6px;color:var(--muted);font:600 11px var(--body);cursor:pointer;position:relative}
 nav.bottom svg{width:25px;height:25px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 nav.bottom button[aria-selected="true"]{color:var(--k0)}
@@ -330,6 +330,34 @@ svg .t-ink{fill:var(--ink)} svg .t-mut{fill:var(--muted)} svg .t-mono{font-famil
 .tpmini div{border:1px solid var(--line);border-radius:12px;padding:10px;display:grid}
 .tpmini span{font-size:12px;color:var(--muted)} .tpmini b{font:700 16px var(--mono)}
 
+/* ask */
+.kbbar{gap:10px}
+.kbok{display:grid;gap:2px} .kbok span{font-size:13px;color:var(--muted)}
+.kberr{color:var(--bad);font-weight:600;font-size:14px}
+.chat{display:grid;gap:12px}
+.me{justify-self:end;max-width:85%;background:var(--k0);color:#fff;border-radius:18px 18px 4px 18px;padding:10px 14px;font-weight:500}
+.me .ctx{display:block;font:600 10px var(--mono);text-transform:uppercase;letter-spacing:.06em;opacity:.8}
+.bot{background:var(--card);border:1px solid var(--line);border-radius:18px 18px 18px 4px;padding:14px;display:grid;gap:10px;box-shadow:var(--shadow);min-width:0}
+.asum{margin:0;padding-left:18px;display:grid;gap:8px}
+.cite{display:inline-block;font:600 11px var(--mono);color:var(--k0);background:color-mix(in srgb,var(--k0) 12%,transparent);border-radius:5px;padding:0 5px;white-space:nowrap}
+mark{background:color-mix(in srgb,var(--k8) 35%,transparent);color:inherit;border-radius:3px;padding:0 1px}
+.xcheck{border:2px solid var(--k6);border-radius:12px;padding:10px 12px;display:grid;gap:6px}
+.xrow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px}
+.xrow span{font:700 12px var(--mono)} .xrow.ok span{color:var(--good)} .xrow.diff span{color:var(--bad)}
+.xrow em{font-style:normal;font:500 12px var(--mono);border:1px solid var(--line);border-radius:6px;padding:1px 6px}
+.srcs summary{cursor:pointer;font-weight:600;color:var(--k0)}
+.src1{border-top:1px solid var(--line);padding:10px 0;display:grid;gap:4px;font-size:14px}
+.src1 p{color:var(--ink);overflow-wrap:anywhere}
+.chipbtn{border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600;cursor:pointer}
+.more{gap:6px}
+.askdock{position:sticky;bottom:calc(70px + env(safe-area-inset-bottom,0px));display:grid;gap:6px;z-index:4}
+.askctx{display:flex;gap:8px;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:6px 10px;font-size:12px;color:var(--muted)}
+.askctx span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.askctx button{border:0;background:none;color:var(--k0);font-weight:700;cursor:pointer;white-space:nowrap}
+.askform{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;background:var(--paper);padding:6px 0}
+.askform input{font:500 16px var(--body);color:var(--ink);background:var(--card);border:2px solid var(--line);border-radius:14px;padding:12px 14px;width:100%}
+.askform input:focus{border-color:var(--k0);outline:none}
+
 </style>
 </head>
 <body>
@@ -350,6 +378,13 @@ svg .t-ink{fill:var(--ink)} svg .t-mut{fill:var(--muted)} svg .t-mono{font-famil
     <div class="boxes" id="boxes"></div>
     <div id="card" class="stack"></div>
     <p class="muted" style="font-size:13px">Say the answer out loud, then tap the card to flip it. Cards you know come back after 1, 2, 4, 8, 16 and 32 days. Cards you miss come back tomorrow.</p>
+  </section>
+  <section class="view" id="v-ask" hidden>
+    <div class="panel kbbar" id="kbbar"></div>
+    <div id="chat" class="chat"><div class="bot"><p><b>Ask anything about piping QC.</b> I search your SAES and SAEP library and this app's field book, then give a short answer with clause numbers and a cross-check between documents. It all works offline.</p>
+      <div class="row more" id="askexamples"><button class="chipbtn" data-ask="Hydrotest hold time">Hydrotest hold time</button><button class="chipbtn" data-ask="Test relief valve setting">Test relief valve setting</button><button class="chipbtn" data-ask="Gauge range and calibration">Gauge range and calibration</button><button class="chipbtn" data-ask="Spring hanger stops during test">Spring hanger stops during test</button><button class="chipbtn" data-ask="Lay-up after hydrotest">Lay-up after hydrotest</button><button class="chipbtn" data-ask="Bolt tightening passes">Bolt tightening passes</button></div></div></div>
+    <div class="askdock"><div class="askctx" id="askctx" hidden><span></span><button type="button" aria-label="Start a new question">✕ new topic</button></div>
+    <form id="askform" class="askform"><input id="askq" type="search" placeholder="e.g. hydrotest hold time for plant piping" autocomplete="off" enterkeyhint="send"><button class="btn primary" aria-label="Ask">Ask</button></form></div>
   </section>
   <section class="view" id="v-quiz" hidden><div id="hub" class="hub"></div></section>
   <section class="view" id="v-tools" hidden>
@@ -452,6 +487,7 @@ svg .t-ink{fill:var(--ink)} svg .t-mut{fill:var(--muted)} svg .t-mono{font-famil
   <button role="tab" data-v="learn" aria-selected="true"><svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5M8 7h7M8 11h7"/></svg>Learn</button>
   <button role="tab" data-v="cards" aria-selected="false"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="14" height="14" rx="2"/><path d="M7 3h12a2 2 0 0 1 2 2v12"/></svg>Cards<span class="badge" id="duebadge" hidden></span></button>
   <button role="tab" data-v="quiz" aria-selected="false"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17.5v.01"/></svg>Quiz</button>
+  <button role="tab" data-v="ask" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><path d="M9 11h6M9 14h4"/></svg>Ask</button>
   <button role="tab" data-v="tools" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/></svg>Tools</button>
 </div></nav>
 
@@ -1338,8 +1374,8 @@ function mixedQuiz(onlyReverse){
 }
 
 /* ---------- navigation ---------- */
-const TABS={learn:"learn",topic:"learn",recap:"learn",run:"quiz",cards:"cards",quiz:"quiz",tools:"tools",calc:"tools",numbers:"tools",plan:"tools",fixes:"tools"};
-const TITLE={learn:"Piping QC",cards:"Flashcards",quiz:"Quiz",tools:"Tools",calc:"Test pressure",numbers:"Numbers",plan:"8-week plan",fixes:"Sources"};
+const TABS={ask:"ask",learn:"learn",topic:"learn",recap:"learn",run:"quiz",cards:"cards",quiz:"quiz",tools:"tools",calc:"tools",numbers:"tools",plan:"tools",fixes:"tools"};
+const TITLE={ask:"Ask the standards",learn:"Piping QC",cards:"Flashcards",quiz:"Quiz",tools:"Tools",calc:"Test pressure",numbers:"Numbers",plan:"8-week plan",fixes:"Sources"};
 let view="learn", backTo=null;
 function setSC(color){document.body.style.setProperty("--sc",color||"var(--k0)")}
 function show(v,opts={}){
@@ -1352,6 +1388,7 @@ function show(v,opts={}){
   if(v==="cards"){setSC();if(!queue.length)startDeck();renderBoxes()}
   if(v==="quiz"){setSC();renderHub()}
   if(v==="tools"||TABS[v]==="tools") setSC();
+  if(v==="ask"){setSC();if(!askInit.done){askInit.done=1;askInit()}}
   if(v!=="topic") stopScene();
   window.scrollTo(0,0);
   try{history.replaceState(null,"","#"+(v==="topic"&&opts.key?opts.key:v))}catch(e){}
@@ -1642,6 +1679,141 @@ function renderPlan(){
   $("#cal").innerHTML=h;
 }
 $("#startdate").addEventListener("change",e=>{store.set("pqc-start",e.target.value);renderPlan()});
+
+/* ---------- Ask: offline search across SAES / SAEP and the field book ---------- */
+const KB_URL="kb/", KB_DB="pqc-kb";
+const STOP=new Set("a an the of to in on for and or is are be by with as at from that this it its what which who how when where why do does did shall should must may can will per than then there their into any all not no".split(" "));
+const SYN={hydrotest:["hydrostatic","hydro","strength"],hydro:["hydrostatic","hydrotest"],psv:["relief","safety"],prv:["relief"],relief:["psv"],rv:["relief"],gasket:["gaskets"],bolt:["bolting","stud","torque"],bolting:["bolt","torque","tightening"],torque:["tightening","bolting"],mtc:["certificate","mill"],pmi:["positive","alloy","verification"],ncr:["nonconformance","nonconforming"],layup:["lay","preservation","mothball"],lay:["layup"],tp:["test","pressure"],dp:["design","pressure"],smys:["yield","strength"],flush:["flushing","cleaning"],clean:["cleaning","flushing"],weep:["hole"],deadleg:["dead","leg"],spring:["hanger","support"],hanger:["spring","support"],blind:["blinds","spectacle"],reinstatement:["reinstate","restoration"],punch:["punchlist"],itp:["inspection","plan"],hold:["witness"],gauge:["gage","gauges"],gage:["gauge"],pneumatic:["air","gas"]};
+const QTY=/(\d+(?:[.,]\d+)?)\s*(%|psig|psi|kpa|mpa|bar|mm|inch(?:es)?|in\b|°\s?c|deg\s?c|minutes?|min\b|hours?|hrs?\b|h\b|days?|ppm|ppb|years?|m\/s|µm)/gi;
+let KB=null, KBidx=null, askCtx=null;
+const stem=w=>w.length>4?w.replace(/(ing|ed|es|s)$/,""):w;
+function toks(s){return String(s).toLowerCase().replace(/saes[-\s]?([a-z])[-\s]?(\d+)/g,"saes$1$2").replace(/saep[-\s]?(\d+)/g,"saep$1").replace(/[^a-z0-9.\s%]/g," ").replace(/(\D)\.|\.(\D|$)/g,"$1 $2").split(/\s+/).filter(w=>w&&!STOP.has(w)).map(stem)}
+function docKey(id){return toks(id).join("")}
+
+/* the field book (study notes) is always searchable, even before a library is loaded */
+function fieldBookCorpus(){
+  const docs=[{id:"Field Book",title:"Study notes in this app",kind:"NOTES"}], chunks=[];
+  S.forEach(s=>s.chunks.forEach((c,ci)=>{chunks.push({d:0,c:`${s.name}`,h:c.h,t:c.p.map(p=>`${p[0]}: ${p[1]} (${p[2]}).${p[3]?" "+p[3]:""}`).join(" "),fb:s.id+ci})}));
+  return {docs,chunks};
+}
+function buildIndex(corpus){
+  const post=new Map(), len=[], docOf=[];
+  corpus.chunks.forEach((ch,i)=>{
+    const tf=new Map(), add=(w,k)=>tf.set(w,(tf.get(w)||0)+k);
+    const tt=toks(ch.t); tt.forEach(w=>add(w,1)); toks(ch.h).forEach(w=>add(w,2));
+    add(docKey(corpus.docs[ch.d].id),1);
+    len.push(tt.length+4); docOf.push(ch.d);
+    tf.forEach((n,w)=>{let a=post.get(w);if(!a)post.set(w,a=[]);a.push(i,n)});
+  });
+  const avg=len.reduce((a,b)=>a+b,0)/Math.max(1,len.length);
+  return {post,len,avg,N:len.length,corpus};
+}
+function search(ix,qterms,boostDocs){
+  const sc=new Float32Array(ix.N), k1=1.2,b=.75;
+  qterms.forEach(([w,wt])=>{const p=ix.post.get(w);if(!p)return;const df=p.length/2,idf=Math.log(1+(ix.N-df+.5)/(df+.5));
+    for(let j=0;j<p.length;j+=2){const i=p[j],tf=p[j+1];sc[i]+=wt*idf*tf*(k1+1)/(tf+k1*(1-b+b*ix.len[i]/ix.avg))}});
+  const out=[];for(let i=0;i<ix.N;i++)if(sc[i]>0){let s=sc[i];if(boostDocs.size&&boostDocs.has(docKey(ix.corpus.docs[ix.corpus.chunks[i].d].id)))s*=2.5;out.push([s,i])}
+  return out.sort((a,b)=>b[0]-a[0]);
+}
+function idfOf(ix,w){const p=ix.post.get(w);if(!p)return 0;const df=p.length/2;return Math.log(1+(ix.N-df+.5)/(df+.5))}
+
+/* ---------- library storage (IndexedDB) ---------- */
+function idb(){return new Promise((res,rej)=>{const r=indexedDB.open(KB_DB,1);r.onupgradeneeded=()=>r.result.createObjectStore("kv");r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
+async function kvGet(k){const db=await idb();return new Promise(res=>{const t=db.transaction("kv").objectStore("kv").get(k);t.onsuccess=()=>res(t.result);t.onerror=()=>res(null)})}
+async function kvSet(k,v){const db=await idb();return new Promise((res,rej)=>{const t=db.transaction("kv","readwrite");t.objectStore("kv").put(v,k);t.oncomplete=res;t.onerror=()=>rej(t.error)})}
+async function decryptKB(buf,pass){
+  const u=new Uint8Array(buf); if(new TextDecoder().decode(u.slice(0,8))!=="PQCIDX1\n") throw new Error("This file isn't a library index.");
+  const salt=u.slice(8,24), iv=u.slice(24,36), ct=u.slice(36);
+  const base=await crypto.subtle.importKey("raw",new TextEncoder().encode(pass),"PBKDF2",false,["deriveKey"]);
+  const key=await crypto.subtle.deriveKey({name:"PBKDF2",salt,iterations:250000,hash:"SHA-256"},base,{name:"AES-GCM",length:256},false,["decrypt"]);
+  let plain; try{plain=await crypto.subtle.decrypt({name:"AES-GCM",iv},key,ct)}catch(e){throw new Error("Wrong passphrase.")}
+  const stream=new Blob([plain]).stream().pipeThrough(new DecompressionStream("gzip"));
+  return JSON.parse(await new Response(stream).text());
+}
+async function fetchManifest(){const r=await fetch(KB_URL+"manifest.json?ts="+Date.now(),{cache:"no-store"});if(!r.ok)return null;return r.json()}
+async function downloadKB(){
+  const m=await fetchManifest(); if(!m) throw new Error("No library has been published yet. Upload your SAES and SAEP zips first.");
+  const r=await fetch(KB_URL+"index.bin?v="+m.version,{cache:"no-store"}); if(!r.ok) throw new Error("Download failed. Try again online.");
+  await kvSet("index",{version:m.version,built:m.built,manifest:m,buf:await r.arrayBuffer()}); return m;
+}
+
+/* ---------- UI ---------- */
+const askState={busy:false,stored:null,remote:null,msg:""};
+function fbIndex(){if(!fbIndex.ix)fbIndex.ix=buildIndex(fieldBookCorpus());return fbIndex.ix}
+async function askInit(){
+  askState.stored=await kvGet("index").catch(()=>null);
+  const pass=store.get("pqc-kbpass","");
+  if(askState.stored&&pass&&!KB) await unlock(pass,true);
+  renderAskBar();
+  if(navigator.onLine) fetchManifest().then(m=>{askState.remote=m;renderAskBar()}).catch(()=>{});
+}
+async function unlock(pass,silent){
+  try{askState.busy=true;renderAskBar();const data=await decryptKB(askState.stored.buf,pass);KB=data;KBidx=buildIndex(data);if($("#kb-remember")?.checked!==false)store.set("pqc-kbpass",pass);askState.msg=""}
+  catch(e){if(!silent)askState.msg=e.message;store.set("pqc-kbpass","")}
+  askState.busy=false;renderAskBar();
+}
+function renderAskBar(){
+  const s=askState, el=$("#kbbar"); if(!el) return;
+  const newer=s.remote&&s.stored&&s.remote.version!==s.stored.version;
+  let h="";
+  if(KB) h=`<div class="kbok"><b>Library ready</b><span>${KB.docs.filter(d=>d.kind==="SAES").length} SAES · ${KB.docs.filter(d=>d.kind==="SAEP").length} SAEP · ${KB.chunks.length.toLocaleString()} clauses · built ${KB.built.slice(0,10)}</span></div>${newer?`<button class="btn primary" id="kb-dl">Download the new version (${s.remote.documents} documents)</button>`:""}`;
+  else if(s.stored) h=`<div class="kbok"><b>Library downloaded</b><span>Enter your passphrase once to unlock it on this phone.</span></div><form id="kb-unlock" class="row"><input type="password" id="kb-pass" placeholder="Library passphrase" autocomplete="current-password" style="flex:1;min-width:180px"><button class="btn primary" ${s.busy?"disabled":""}>${s.busy?"Unlocking…":"Unlock"}</button></form><label class="toggle" style="font-size:13px"><input type="checkbox" id="kb-remember" checked> Remember on this phone</label>`;
+  else h=`<div class="kbok"><b>Study notes only</b><span>${s.remote?`A library of ${s.remote.documents} documents is available.`:"Answers come from this app's field book until your SAES and SAEP library is published."}</span></div>${s.remote?`<button class="btn primary" id="kb-dl">Download library (${(s.remote.bytes/1048576).toFixed(1)} MB)</button>`:""}`;
+  el.innerHTML=h+(s.msg?`<p class="kberr">${esc(s.msg)}</p>`:"");
+}
+$("#kbbar")?.addEventListener("click",async e=>{if(e.target.id!=="kb-dl")return;e.target.disabled=true;e.target.textContent="Downloading…";try{await downloadKB();askState.stored=await kvGet("index");KB=null;const p=store.get("pqc-kbpass","");if(p)await unlock(p,true);askState.remote=askState.stored.manifest}catch(err){askState.msg=err.message}renderAskBar()});
+$("#kbbar")?.addEventListener("submit",e=>{e.preventDefault();const p=$("#kb-pass").value;if(p)unlock(p)});
+
+function isFollowUp(q,tt){return askCtx&&(tt.length<=3||/^(and|but|what about|how about|also|same|is that|are you sure|why|what if|for|then|does that|so)\b/i.test(q.trim()))}
+function answer(q){
+  const tt=toks(q); if(!tt.length) return;
+  const follow=isFollowUp(q,tt);
+  const terms=new Map(); const put=(w,x)=>terms.set(w,Math.max(terms.get(w)||0,x));
+  tt.forEach(w=>{put(w,1);(SYN[w]||[]).forEach(s=>put(stem(s),.5))});
+  if(follow) askCtx.terms.forEach(([w,x])=>put(w,x*.6));
+  const qterms=[...terms]; const boost=new Set();
+  (q.match(/(saes|saep)[-\s]?[a-z]?[-\s]?\d+/gi)||[]).forEach(m=>boost.add(docKey(m)));
+  if(follow) askCtx.boost.forEach(x=>boost.add(x));
+  const sources=[];
+  if(KBidx) search(KBidx,qterms,boost).slice(0,60).forEach(([s,i])=>sources.push({s,ix:KBidx,ch:KBidx.corpus.chunks[i]}));
+  search(fbIndex(),qterms,new Set()).slice(0,8).forEach(([s,i])=>sources.push({s:s*(KBidx?.55:1),ix:fbIndex(),ch:fbIndex().corpus.chunks[i]}));
+  const pairs=[];for(let i=0;i+1<tt.length;i++)pairs.push(tt[i]+" "+tt[i+1]);
+  if(pairs.length) sources.forEach(r=>{const j=" "+toks(r.ch.h+" "+r.ch.t).join(" ")+" ";let n=0;pairs.forEach(p=>{if(j.includes(" "+p+" "))n++});r.s*=1+.35*n});
+  sources.sort((a,b)=>b.s-a.s);
+  const per=new Map(), top=[];
+  for(const r of sources){const d=r.ix.corpus.docs[r.ch.d].id, n=per.get(d)||0; if(n>=3) continue; per.set(d,n+1); top.push(r); if(top.length>=9) break;}
+  askCtx={q:follow?askCtx.q+" → "+q:q,terms:qterms.filter(([w,x])=>x>=.5).map(([w,x])=>[w,Math.min(x,1)]),boost:[...boost]};
+  addTurn(q,top,qterms,follow);
+}
+function sentencesOf(t){return t.split(/(?<=[.;])\s+(?=[A-Z(])/).map(s=>s.trim()).filter(s=>s.length>15)}
+function cite(r){const d=r.ix.corpus.docs[r.ch.d];return d.kind==="NOTES"?"Field book · "+r.ch.h:`${d.id}${r.ch.c?" §"+r.ch.c:""}`}
+function highlight(t,set){return esc(t).replace(/[A-Za-z0-9.%]+/g,w=>set.has(stem(w.toLowerCase()))?`<mark>${w}</mark>`:w)}
+function addTurn(q,top,qterms,follow){
+  const box=$("#chat"), set=new Set(qterms.map(x=>x[0])), ix0=KBidx||fbIndex();
+  let html=`<div class="me">${follow?`<span class="ctx">follow-up</span>`:""}${esc(q)}</div>`;
+  if(!top.length){html+=`<div class="bot"><p>I couldn't find that in ${KB?"your library or the field book":"the field book"}. Try other words, a document number (for example SAES-L-150), or a shorter question.</p></div>`;box.insertAdjacentHTML("beforeend",html);box.lastElementChild.scrollIntoView({behavior:"smooth",block:"start"});return}
+  // summary: best sentences across the top clauses, preferring different documents
+  const cands=[];top.forEach((r,ri)=>sentencesOf(r.ch.t).forEach(s=>{const w=new Set(toks(s));let sc=0;qterms.forEach(([t,x])=>{if(w.has(t))sc+=x*idfOf(r.ix,t)});if(QTY.test(s))sc*=1.15;QTY.lastIndex=0;if(sc>0)cands.push({s,sc:sc*(1-ri*.04),r})}));
+  cands.sort((a,b)=>b.sc-a.sc); const pickS=[],usedDoc=new Map();
+  for(const c of cands){const d=cite(c.r);if((usedDoc.get(d)||0)>=2||pickS.some(p=>p.s===c.s))continue;pickS.push(c);usedDoc.set(d,(usedDoc.get(d)||0)+1);if(pickS.length>=4)break}
+  // cross-check: same unit, values from different documents
+  const units=new Map();
+  top.forEach(r=>{const d=r.ix.corpus.docs[r.ch.d];sentencesOf(r.ch.t).forEach(s=>{const w=new Set(toks(s));if(![...set].some(t=>w.has(t)))return;for(const m of s.matchAll(QTY)){let u=m[2].toLowerCase().replace(/\s/g,"").replace(/^deg/,"°").replace(/^(minutes?|min)$/,"min").replace(/^(hours?|hrs?|h)$/,"h").replace(/^days?$/,"days").replace(/^inch(es)?$/,"in").replace(/^years?$/,"years");if(!units.has(u))units.set(u,new Map());const mm=units.get(u);const k=d.kind==="NOTES"?"Field book":d.id;if(!mm.has(k))mm.set(k,new Set());mm.get(k).add(m[1].replace(",",""))}})});
+  const rows=[...units].filter(([u,m])=>m.size>=2).slice(0,4);
+  const docsTop=[...new Map(top.map(r=>[r.ix.corpus.docs[r.ch.d].id,r])).values()];
+  html+=`<div class="bot"><div class="ahead"><span class="eyebrow">Answer from ${docsTop.length} document${docsTop.length>1?"s":""}</span></div>
+  <ul class="asum">${pickS.map(c=>`<li>${highlight(c.s,set)} <span class="cite">${esc(cite(c.r))}</span></li>`).join("")}</ul>
+  ${rows.length?`<div class="xcheck"><b>Cross-check across documents</b>${rows.map(([u,m])=>{const vals=[...m.values()].map(v=>[...v].sort().join("/"));const agree=vals.every(v=>v===vals[0]);return `<div class="xrow ${agree?"ok":"diff"}"><span>${agree?"✓ agree":"⚠ differ"} · ${esc(u)}</span>${[...m].map(([d,v])=>`<em>${esc(d)}: ${esc([...v].join(", "))} ${esc(u)}</em>`).join("")}</div>`}).join("")}<p class="muted" style="font-size:12px">Different values can be for different cases (size, service, test type). Read the clauses before you quote one.</p></div>`:`<p class="muted" style="font-size:12px">${docsTop.length>1?"No conflicting numbers found between these documents.":"Only one document matched, so there's nothing to cross-check."}</p>`}
+  <details class="srcs"><summary>Sources (${top.length} clauses)</summary>${top.map(r=>{const d=r.ix.corpus.docs[r.ch.d];return `<div class="src1"><div><b>${esc(d.kind==="NOTES"?"Field book":d.id)}</b>${r.ch.c?` §${esc(r.ch.c)}`:""} · ${esc(r.ch.h)}${r.ch.p?` · p. ${r.ch.p}`:""}</div>${d.title&&d.kind!=="NOTES"?`<div class="muted" style="font-size:12px">${esc(d.title)}</div>`:""}<p>${highlight(r.ch.t,set)}</p>${r.ch.fb?`<button class="btn" data-open="${r.ch.fb}">Open topic</button>`:""}</div>`}).join("")}</details>
+  <div class="row more">${["Are you sure?","Which standard says this?","What about stainless?"].map(t=>`<button class="chipbtn" data-ask="${esc(t)}">${esc(t)}</button>`).join("")}${[...new Set(top.slice(1,5).map(r=>r.ch.h).filter(h=>h&&h!=="Introduction"&&h!==top[0].ch.h))].slice(0,2).map(h=>`<button class="chipbtn" data-ask="${esc(h)}">${esc(h)}</button>`).join("")}</div></div>`;
+  box.insertAdjacentHTML("beforeend",html);
+  box.lastElementChild.previousElementSibling.scrollIntoView({behavior:"smooth",block:"start"});
+  $("#askctx").hidden=false; $("#askctx span").textContent="Follow-ups build on: "+askCtx.q;
+}
+$("#askform").addEventListener("submit",e=>{e.preventDefault();const q=$("#askq").value.trim();if(!q)return;$("#askq").value="";answer(q);markActive()});
+$("#chat").addEventListener("click",e=>{const a=e.target.closest("[data-ask]");if(a){answer(a.dataset.ask);return}const o=e.target.closest("[data-open]");if(o)openTopic(o.dataset.open)});
+$("#askctx button").addEventListener("click",()=>{askCtx=null;$("#askctx").hidden=true});
+$("#askexamples").addEventListener("click",e=>{const b=e.target.closest("[data-ask]");if(b)answer(b.dataset.ask)});
 
 
 /* ---------- offline ---------- */
