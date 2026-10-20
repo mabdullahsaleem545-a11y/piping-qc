@@ -1,9 +1,9 @@
 {
- "version": "7638a6e2432a",
- "built": "2026-10-20T13:21:03Z",
+ "version": "cb25bf8c4d2a",
+ "built": "2026-10-20T13:48:17Z",
  "documents": 445,
- "clauses": 40818,
- "bytes": 4991053,
+ "clauses": 23892,
+ "bytes": 4727595,
  "saes": 252,
  "saep": 193
 }
